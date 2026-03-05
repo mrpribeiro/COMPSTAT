@@ -14,23 +14,28 @@ The original data was acquired from **critically-ill patients** during hospital 
 -   Fixed parameters, such as **age** and **gender**
 -   **Manual annotations of breaths**
 
-# Installation and data loading
+# Load packages and dataset
 
 ```{r}
-# Install necessary packages
+# Install packages
 #install.packages("stream")
 #install.packages("animation")
-# Load necessary libraries
+
+# Load libraries
 library(stream)
 library(animation)
 ```
+
+Dataset here is loaded **only for exploration and visualization purposes**. The stream will read the file sequentially without loading the entire dataset into memory.
 
 ```{r}
 # Download the dataset
 #url <- "https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download"
 #download.file(url, destfile = "bidmc_01_Numerics.csv")
-# Read the dataset
+
+# The stream reads the file sequentially without loading the entire dataset into memory
 data <- read.csv("bidmc_01_Numerics.csv")
+
 # Display the first few rows of the dataset
 head(data)
 ```
@@ -49,12 +54,26 @@ summary(data)
 
 Keep counters of equal-width grid-cells (base counters for micro-cluster definitions) of a 2-dimensional continuous data stream using different window models (landmark, sliding, weighted, fading).
 
+Two approaches are implemented:
+
+1)  Manual implementation of grid-cell counters
+    -   Landmark window
+    -   Sliding window
+    -   Weighted window
+    -   Fading window
+2)  Use of built-in models from the 'stream' package
+    -   D-Stream algorithm
+    -   Sliding window model
+
+The data stream consists of two physiological variables: - Heart Rate (HR) and Respiratory Rate (RESP).
+
 ```{r}
-# Create a single 2-dimensional stream with heart rate (HR) and respiratory rate (RESP) directly from the file
+# Create a single 2-dimensional stream with HR and RESP directly from the file
+  # The stream reads the file sequentially without loading the entire dataset into memory
 stream_2d <- DSD_ReadCSV("bidmc_01_Numerics.csv", 
                            header = TRUE, 
                            sep = ",", 
-                           take = c(2, 4)) # The 'take' parameter receives the numerical indices of the columns to be extracted.
+                           take = c(2, 4)) # HR and RESP column indices
 ```
 
 ### Parameter definition and grid setup
@@ -62,27 +81,24 @@ stream_2d <- DSD_ReadCSV("bidmc_01_Numerics.csv",
 ```{r}
 
 # Time window parameters
-w <- 100           # Objective window size (e.g., last 100 points)
-eps <- 0.05        # Admissible ballast weight (maximum error threshold)
-alpha <- eps^(1/w) # Weight factor calculation
+w <- 100           # Sliding window size
+eps <- 0.05         # Error tolerance
+alpha <- eps^(1/w)  # Exponential decay factor
+
+iterations <- 2000  # Number of stream points processed
 
 # Define Equal-Width Grid-Cells 
-# X-Axis: Heart Rate (HR) - typically between 0 and 200 bpm, bin size 10
+# X-Axis: HR - typically between 0 and 200 bpm, bin size 10
 breaks_hr <- seq(0, 200, by = 10)
-# Y-Axis: Respiratory Rate (RESP) - typically between 0 and 60 breaths/min, bin size 2
+# Y-Axis: RESP - typically between 0 and 60 breaths/min, bin size 2
 breaks_resp <- seq(0, 60, by = 2)
-
-# Com os parametros de cima a visualizacao aparece muito pequena, então para visualizar melhor é só necessário usar estes parametros:
-#breaks_hr <- seq(78, 110, by = 5)
-#breaks_resp <- seq(10, 36, by = 1)
-
 
 n_bins_hr <- length(breaks_hr) - 1
 n_bins_resp <- length(breaks_resp) - 1
 
 ```
 
-### Initialization of the 4 window models
+### Initialization of grid counters (manual implementation)
 
 ```{r}
 # Each matrix represents the 2D grid where rows are HR and columns are RESP
@@ -91,121 +107,171 @@ grid_sliding  <- matrix(0, nrow = n_bins_hr, ncol = n_bins_resp)
 grid_weighted <- matrix(0, nrow = n_bins_hr, ncol = n_bins_resp)
 grid_fading   <- matrix(0, nrow = n_bins_hr, ncol = n_bins_resp)
 
-# Buffer list strictly for models with memory (Sliding and Weighted)
+# Buffer storing coordinates of the last w observations
 # It will store the (row, col) coordinates of the data points inside the window
 buffer_history <- list()
 ```
 
-### Stream processing (iterative step)
+### Stream processing (iterative step) - MANUAL APPROACH
 
 ```{r}
-itera <- 2000 # Simulated number of incoming data points
+saveGIF({
 
-# Graphic window to exibit 4 plots in 2x2 format
-par(mfrow = c(2, 2))
+par(mfrow=c(2,2))
 
-for (i in 1:itera) {
+for(i in 1:iterations){
+
+  # Retrieve one point from the stream
+  pt <- get_points(stream_2d,1)
+
+  if(nrow(pt)==0) break
+
+  hr_val <- as.numeric(pt[1,1])
+  resp_val <- as.numeric(pt[1,2])
+
+  # Skip missing sensor readings
+  if(is.na(hr_val) || is.na(resp_val)) next
+
+
+  # --------------------------------------------------------
+  # Map the observation to a grid cell
+  # --------------------------------------------------------
+
+  idx_hr <- findInterval(hr_val,breaks_hr,all.inside=TRUE)
+  idx_resp <- findInterval(resp_val,breaks_resp,all.inside=TRUE)
+
+  coord <- c(idx_hr,idx_resp)
   
-  # Read a single data point from the stream (Single Scan)
-  pt <- get_points(stream_2d, n = 1)
-  if (nrow(pt) == 0) break # Stop if stream is exhausted
-  
-  hr_val <- as.numeric(pt[1, 1])
-  resp_val <- as.numeric(pt[1, 2])
-  
-  # Skip computation if sensor data is missing (NA)
-  if (is.na(hr_val) || is.na(resp_val)) next
-  
-  # Find the correct grid-cell indices for the current data point
-  idx_hr <- findInterval(hr_val, breaks_hr, all.inside = TRUE)
-  idx_resp <- findInterval(resp_val, breaks_resp, all.inside = TRUE)
-  
-  current_coord <- c(idx_hr, idx_resp)
-  
-  # --------------------------------------------------------------------------
-  # UPDATE: LANDMARK WINDOW (Accumulates forever)
-  # --------------------------------------------------------------------------
-  grid_landmark[idx_hr, idx_resp] <- grid_landmark[idx_hr, idx_resp] + 1
-  
-  # --------------------------------------------------------------------------
-  # UPDATE: SLIDING WINDOW (Strictly the last 'w' elements)
-  # --------------------------------------------------------------------------
-  grid_sliding[idx_hr, idx_resp] <- grid_sliding[idx_hr, idx_resp] + 1
-  
-  # --------------------------------------------------------------------------
-  # UPDATE: WEIGHTED SLIDING WINDOW (Decay + Explicit Removal)
-  # --------------------------------------------------------------------------
-  # Older data is less but still important
+  # --------------------------------------------------------
+  # LANDMARK WINDOW
+  # Counts all observations since the beginning
+  # --------------------------------------------------------
+
+  grid_landmark[idx_hr,idx_resp] <-
+    grid_landmark[idx_hr,idx_resp] + 1
+
+
+  # --------------------------------------------------------
+  # SLIDING WINDOW
+  # Keeps only the last w observations
+  # --------------------------------------------------------
+
+  grid_sliding[idx_hr,idx_resp] <-
+    grid_sliding[idx_hr,idx_resp] + 1
+
+
+  # --------------------------------------------------------
+  # WEIGHTED WINDOW
+  # Applies exponential decay to older observations
+  # --------------------------------------------------------
+
   grid_weighted <- grid_weighted * alpha
-  grid_weighted[idx_hr, idx_resp] <- grid_weighted[idx_hr, idx_resp] + 1
+
+  grid_weighted[idx_hr,idx_resp] <-
+    grid_weighted[idx_hr,idx_resp] + 1
+
   
-  # --------------------------------------------------------------------------
-  # UPDATE: FADING WINDOW (Memoryless Decay)
-  # --------------------------------------------------------------------------
-  # Uses all previous data to approximate a weighted window 
-  # Formula: F_alpha,l(i) = c_li + alpha * F_alpha,l(i-1)
+  # --------------------------------------------------------
+  # FADING WINDOW
+  # Memoryless exponential decay model
+  # --------------------------------------------------------
+
   grid_fading <- grid_fading * alpha
-  grid_fading[idx_hr, idx_resp] <- grid_fading[idx_hr, idx_resp] + 1
-  
-  # --------------------------------------------------------------------------
-  # MEMORY MANAGEMENT FOR SLIDING & WEIGHTED MODELS
-  # --------------------------------------------------------------------------
-  # Add the new coordinates to the end of the buffer
-  buffer_history[[length(buffer_history) + 1]] <- current_coord
-  
-  # If the window exceeds its maximum size 'w', the oldest point must be forgotten
-  if (length(buffer_history) > w) {
-    
-    # Retrieve the coordinates of the oldest point
-    old_coord <- buffer_history[[1]]
-    o_hr <- old_coord[1]
-    o_resp <- old_coord[2]
-    
-    # Remove from Sliding Window (its weight was exactly 1)
-    grid_sliding[o_hr, o_resp] <- grid_sliding[o_hr, o_resp] - 1
-    
-    # Remove from Weighted Sliding Window
-    # The oldest point has decayed 'w' times, so its current residual weight is exactly alpha^w
-    grid_weighted[o_hr, o_resp] <- grid_weighted[o_hr, o_resp] - (alpha^w)
-    
-    # Discard the oldest point from the buffer to maintain fixed memory size
+
+  grid_fading[idx_hr,idx_resp] <-
+    grid_fading[idx_hr,idx_resp] + 1
+
+
+  # --------------------------------------------------------
+  # BUFFER MANAGEMENT (for sliding window)
+  # --------------------------------------------------------
+  buffer_history[[length(buffer_history)+1]] <- coord
+
+  if(length(buffer_history) > w){
+
+    old <- buffer_history[[1]]
+
+    grid_sliding[old[1],old[2]] <-
+      grid_sliding[old[1],old[2]] - 1
+
     buffer_history[[1]] <- NULL
   }
-  
-  # COMEÇAR DESENVOLVIMENTO DA ANIMAÇÃO AQUI
-  
+
+  # --------------------------------------------------------
+  # VISUALIZATION
+  # --------------------------------------------------------
+
+  image(grid_landmark,
+        main="Landmark Window",
+        xlab="HR bins",
+        ylab="RESP bins")
+
+  image(grid_sliding,
+        main="Sliding Window",
+        xlab="HR bins",
+        ylab="RESP bins")
+
+  image(grid_weighted,
+        main="Weighted Window",
+        xlab="HR bins",
+        ylab="RESP bins")
+
+  image(grid_fading,
+        main="Fading Window",
+        xlab="HR bins",
+        ylab="RESP bins")
+
 }
+
+}, interval=0.2)
+  
 ```
 
+### Reseting stream before 2nd approach
+
 ```{r}
-# ==============================================================================
-# 2. DEFINIÇÃO DOS MODELOS DE JANELA E MICRO-CLUSTERS
-# ==============================================================================
-# A. Modelo Landmark (Marco)
-dsc_landmark <- DSC_DStream(gridsize = 5, lambda = 0)
+reset_stream(stream_2d)
+```
 
-# B. Modelo Fading / Weighted (Desvanecimento)
-dsc_fading <- DSC_DStream(gridsize = 5, lambda = 0.01)
+### Stream processing (iterative step) - USING BUILT-IN MODELS FROM 'stream' PACKAGE
 
-# C. Modelo Sliding Window (Janela Deslizante estrita)
-dsc_sliding <- DSC_Window(horizon = 100)
+```{r}
 
-# D. Modelo Sliding Window Amortecida (Damped Window)
-dsc_weighted_window <- DSC_Window(horizon = 100, lambda = 0.01)
+# These models implement micro-cluster algorithms internally.
+
+# Landmark-like behaviour (no fading)
+dsc_landmark <- DSC_DStream(
+  gridsize = 5,
+  lambda = 0
+)
+
+# Fading model (D-Stream with decay)
+dsc_fading <- DSC_DStream(
+  gridsize = 5,
+  lambda = 0.01
+)
+
+# Strict sliding window model
+dsc_sliding <- DSC_Window(
+  horizon = 100
+)
+
+# Weighted sliding window model
+dsc_weighted <- DSC_Window(
+  horizon = 100,
+  lambda = 0.01
+)
 ```
 
 # Animation of the evolution of micro-clusters (D-Stream Fading Model)
 
 ```{r}
-# The reset_stream function returns to the beginning of the file.
-reset_stream(stream_2d)
-
 ani.options(interval = 0.2)
 
 saveHTML({
   animate_cluster(
     dsc_fading,             
-    stream_data, 
+    stream_2d, 
     horizon = 100,          
     n = 2000,               
     plot.args = list(
@@ -215,10 +281,12 @@ saveHTML({
       ylim = c(0, 40),    # Adjust the expected scale for RESP
       xlab = "Heart Rate (HR)",
       ylab = "Respiratory Rate (RESP)",
-      main = "Evolution 2D of Grid-Cells (D-Stream Fading Model)"
+      main = "2D Grid Evolution (D-Stream Fading Model)"
     )
   )
-}, img.name = "stream_grid_animation", htmlfile = "evolucao_grelha.html")
+},
+img.name = "stream_grid_animation",
+htmlfile = "evolucao_grelha.html")
 ```
 
 # Explore and update other models
@@ -232,7 +300,6 @@ update(dsc_sliding, stream_data, n = 1000)
 cat("\n--- Centros da Janela Deslizante (Primeiros 6) ---\n")
 print(head(get_centers(dsc_sliding)))
 
-# Limpeza e fecho da ligação do ficheiro
+# Close stream connection
 close_stream(stream_data)
 ```
-
