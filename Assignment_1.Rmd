@@ -4,15 +4,15 @@ author: "João Silva, Marco Pereira, Mariana Ribeiro"
 date: "2026-03-04"
 output: html_document
 ---
+
 # Dataset description
 
-The original data was acquired from **critically-ill patients** during hospital care at the Beth Israel Deaconess Medical Centre (Boston, MA, USA). 
-**Two annotators** manually annotated individual breaths in each recording using the impedance respiratory signal. The **53 recordings** within the dataset, each of **8-minute** duration, each contain:
+The original data was acquired from **critically-ill patients** during hospital care at the Beth Israel Deaconess Medical Centre (Boston, MA, USA). **Two annotators** manually annotated individual breaths in each recording using the impedance respiratory signal. The **53 recordings** within the dataset, each of **8-minute** duration, each contain:
 
-- Physiological signals include the photoplethysmogram **(PPG)**, impedance respiratory signal, and electrocardiogram (**ECG**). These are sampled at **125 Hz**.
-- Physiological parameters, such as the heart rate (**HR**), respiratory rate (**RESP**), and blood oxygen saturation level (**SpO2**). These are sampled at 1 Hz.
-- Fixed parameters, such as **age** and **gender**
-- **Manual annotations of breaths**
+-   Physiological signals include the photoplethysmogram **(PPG)**, impedance respiratory signal, and electrocardiogram (**ECG**). These are sampled at **125 Hz**.
+-   Physiological parameters, such as the heart rate (**HR**), respiratory rate (**RESP**), and blood oxygen saturation level (**SpO2**). These are sampled at 1 Hz.
+-   Fixed parameters, such as **age** and **gender**
+-   **Manual annotations of breaths**
 
 # Installation and data loading
 
@@ -37,17 +37,137 @@ head(data)
 # Show the structure of the dataset
 str(data)
 ```
+
 ```{r}
 # Show summary statistics of the dataset
 summary(data)
 ```
-# Assignment 
+
+# Assignment
 
 Keep counters of equal-width grid-cells (base counters for micro-cluster definitions) of a 2-dimensional continuous data stream using different window models (landmark, sliding, weighted, fading).
 
 ```{r}
-# Create two data stream from the dataset heart rate (HR) and respiratory rate (RESP)
-stream1 <- DSD_Memory(data$HR)
-stream2 <- DSD_Memory(data$RESP)
+# Create a single 2-dimensional stream with heart rate (HR) and respiratory rate (RESP)
+stream_2d <- DSD_Memory(data[, c("HR", "RESP")])
 ```
 
+### Parameter definition and grid setup
+
+```{r}
+
+# Time window parameters
+w <- 100           # Objective window size (e.g., last 100 points)
+eps <- 0.05        # Admissible ballast weight (maximum error threshold)
+alpha <- eps^(1/w) # Weight factor calculation
+
+# Define Equal-Width Grid-Cells 
+# X-Axis: Heart Rate (HR) - typically between 0 and 200 bpm, bin size 10
+breaks_hr <- seq(0, 200, by = 10)
+# Y-Axis: Respiratory Rate (RESP) - typically between 0 and 60 breaths/min, bin size 2
+breaks_resp <- seq(0, 60, by = 2)
+
+# Com os parametros de cima a visualizacao aparece muito pequena, então para visualizar melhor é só necessário usar estes parametros:
+#breaks_hr <- seq(78, 110, by = 5)
+#breaks_resp <- seq(10, 36, by = 1)
+
+
+n_bins_hr <- length(breaks_hr) - 1
+n_bins_resp <- length(breaks_resp) - 1
+
+```
+
+### Initialization of the 4 window models
+
+```{r}
+# Each matrix represents the 2D grid where rows are HR and columns are RESP
+grid_landmark <- matrix(0, nrow = n_bins_hr, ncol = n_bins_resp)
+grid_sliding  <- matrix(0, nrow = n_bins_hr, ncol = n_bins_resp)
+grid_weighted <- matrix(0, nrow = n_bins_hr, ncol = n_bins_resp)
+grid_fading   <- matrix(0, nrow = n_bins_hr, ncol = n_bins_resp)
+
+# Buffer list strictly for models with memory (Sliding and Weighted)
+# It will store the (row, col) coordinates of the data points inside the window
+buffer_history <- list()
+```
+
+### Stream processing (iterative step)
+
+```{r}
+itera <- 2000 # Simulated number of incoming data points
+
+# Graphic window to exibit 4 plots in 2x2 format
+par(mfrow = c(2, 2))
+
+for (i in 1:itera) {
+  
+  # Read a single data point from the stream (Single Scan)
+  pt <- get_points(stream_2d, n = 1)
+  if (nrow(pt) == 0) break # Stop if stream is exhausted
+  
+  hr_val <- as.numeric(pt[1, 1])
+  resp_val <- as.numeric(pt[1, 2])
+  
+  # Skip computation if sensor data is missing (NA)
+  if (is.na(hr_val) || is.na(resp_val)) next
+  
+  # Find the correct grid-cell indices for the current data point
+  idx_hr <- findInterval(hr_val, breaks_hr, all.inside = TRUE)
+  idx_resp <- findInterval(resp_val, breaks_resp, all.inside = TRUE)
+  
+  current_coord <- c(idx_hr, idx_resp)
+  
+  # --------------------------------------------------------------------------
+  # UPDATE: LANDMARK WINDOW (Accumulates forever)
+  # --------------------------------------------------------------------------
+  grid_landmark[idx_hr, idx_resp] <- grid_landmark[idx_hr, idx_resp] + 1
+  
+  # --------------------------------------------------------------------------
+  # UPDATE: SLIDING WINDOW (Strictly the last 'w' elements)
+  # --------------------------------------------------------------------------
+  grid_sliding[idx_hr, idx_resp] <- grid_sliding[idx_hr, idx_resp] + 1
+  
+  # --------------------------------------------------------------------------
+  # UPDATE: WEIGHTED SLIDING WINDOW (Decay + Explicit Removal)
+  # --------------------------------------------------------------------------
+  # Older data is less but still important
+  grid_weighted <- grid_weighted * alpha
+  grid_weighted[idx_hr, idx_resp] <- grid_weighted[idx_hr, idx_resp] + 1
+  
+  # --------------------------------------------------------------------------
+  # UPDATE: FADING WINDOW (Memoryless Decay)
+  # --------------------------------------------------------------------------
+  # Uses all previous data to approximate a weighted window 
+  # Formula: F_alpha,l(i) = c_li + alpha * F_alpha,l(i-1)
+  grid_fading <- grid_fading * alpha
+  grid_fading[idx_hr, idx_resp] <- grid_fading[idx_hr, idx_resp] + 1
+  
+  # --------------------------------------------------------------------------
+  # MEMORY MANAGEMENT FOR SLIDING & WEIGHTED MODELS
+  # --------------------------------------------------------------------------
+  # Add the new coordinates to the end of the buffer
+  buffer_history[[length(buffer_history) + 1]] <- current_coord
+  
+  # If the window exceeds its maximum size 'w', the oldest point must be forgotten
+  if (length(buffer_history) > w) {
+    
+    # Retrieve the coordinates of the oldest point
+    old_coord <- buffer_history[[1]]
+    o_hr <- old_coord[1]
+    o_resp <- old_coord[2]
+    
+    # Remove from Sliding Window (its weight was exactly 1)
+    grid_sliding[o_hr, o_resp] <- grid_sliding[o_hr, o_resp] - 1
+    
+    # Remove from Weighted Sliding Window
+    # The oldest point has decayed 'w' times, so its current residual weight is exactly alpha^w
+    grid_weighted[o_hr, o_resp] <- grid_weighted[o_hr, o_resp] - (alpha^w)
+    
+    # Discard the oldest point from the buffer to maintain fixed memory size
+    buffer_history[[1]] <- NULL
+  }
+  
+  # COMEÇAR DESENVOLVIMENTO DA ANIMAÇÃO AQUI
+  
+}
+```
