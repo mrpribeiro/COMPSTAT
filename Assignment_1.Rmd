@@ -19,14 +19,16 @@ The original data was acquired from **critically-ill patients** during hospital 
 ```{r}
 # Install necessary packages
 #install.packages("stream")
+#install.packages("animation")
 # Load necessary libraries
 library(stream)
+library(animation)
 ```
 
 ```{r}
 # Download the dataset
-url <- "https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download"
-download.file(url, destfile = "bidmc_01_Numerics.csv")
+#url <- "https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download"
+#download.file(url, destfile = "bidmc_01_Numerics.csv")
 # Read the dataset
 data <- read.csv("bidmc_01_Numerics.csv")
 # Display the first few rows of the dataset
@@ -48,8 +50,11 @@ summary(data)
 Keep counters of equal-width grid-cells (base counters for micro-cluster definitions) of a 2-dimensional continuous data stream using different window models (landmark, sliding, weighted, fading).
 
 ```{r}
-# Create a single 2-dimensional stream with heart rate (HR) and respiratory rate (RESP)
-stream_2d <- DSD_Memory(data[, c("HR", "RESP")])
+# Create a single 2-dimensional stream with heart rate (HR) and respiratory rate (RESP) directly from the file
+stream_2d <- DSD_ReadCSV("bidmc_01_Numerics.csv", 
+                           header = TRUE, 
+                           sep = ",", 
+                           take = c(2, 4)) # The 'take' parameter receives the numerical indices of the columns to be extracted.
 ```
 
 ### Parameter definition and grid setup
@@ -171,3 +176,63 @@ for (i in 1:itera) {
   
 }
 ```
+
+```{r}
+# ==============================================================================
+# 2. DEFINIÇÃO DOS MODELOS DE JANELA E MICRO-CLUSTERS
+# ==============================================================================
+# A. Modelo Landmark (Marco)
+dsc_landmark <- DSC_DStream(gridsize = 5, lambda = 0)
+
+# B. Modelo Fading / Weighted (Desvanecimento)
+dsc_fading <- DSC_DStream(gridsize = 5, lambda = 0.01)
+
+# C. Modelo Sliding Window (Janela Deslizante estrita)
+dsc_sliding <- DSC_Window(horizon = 100)
+
+# D. Modelo Sliding Window Amortecida (Damped Window)
+dsc_weighted_window <- DSC_Window(horizon = 100, lambda = 0.01)
+```
+
+# Animation of the evolution of micro-clusters (D-Stream Fading Model)
+
+```{r}
+# The reset_stream function returns to the beginning of the file.
+reset_stream(stream_2d)
+
+ani.options(interval = 0.2)
+
+saveHTML({
+  animate_cluster(
+    dsc_fading,             
+    stream_data, 
+    horizon = 100,          
+    n = 2000,               
+    plot.args = list(
+      type = "both",        
+      grid = TRUE,          
+      xlim = c(40, 140),  # Adjust the expected scale for HR
+      ylim = c(0, 40),    # Adjust the expected scale for RESP
+      xlab = "Heart Rate (HR)",
+      ylab = "Respiratory Rate (RESP)",
+      main = "Evolution 2D of Grid-Cells (D-Stream Fading Model)"
+    )
+  )
+}, img.name = "stream_grid_animation", htmlfile = "evolucao_grelha.html")
+```
+
+# Explore and update other models
+
+```{r}
+# Sempre que necessitar de reavaliar o mesmo fluxo do início, faça reset:
+reset_stream(stream_data)
+
+update(dsc_sliding, stream_data, n = 1000)
+
+cat("\n--- Centros da Janela Deslizante (Primeiros 6) ---\n")
+print(head(get_centers(dsc_sliding)))
+
+# Limpeza e fecho da ligação do ficheiro
+close_stream(stream_data)
+```
+
