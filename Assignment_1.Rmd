@@ -67,6 +67,8 @@ Two approaches are implemented:
 
 The data stream consists of two physiological variables: - Heart Rate (HR) and Respiratory Rate (RESP).
 
+## 1)  Manual implementation of grid-cell counters
+
 ```{r}
 # Create a single 2-dimensional stream with HR and RESP directly from the file
   # The stream reads the file sequentially without loading the entire dataset into memory
@@ -79,22 +81,21 @@ stream_2d <- DSD_ReadCSV("bidmc_01_Numerics.csv",
 ### Parameter definition and grid setup
 
 ```{r}
-
 # Time window parameters
 w <- 100           # Sliding window size
 eps <- 0.05         # Error tolerance
 alpha <- eps^(1/w)  # Exponential decay factor
 
-iterations <- 2000  # Number of stream points processed
+iterations <- 481  # Number of stream points processed
 
 # Define Equal-Width Grid-Cells 
 # X-Axis: HR - typically between 0 and 200 bpm, bin size 10
-breaks_hr <- seq(0, 200, by = 10)
+breaks_hr <- seq(88, 95, by = 1)
 # Y-Axis: RESP - typically between 0 and 60 breaths/min, bin size 2
-breaks_resp <- seq(0, 60, by = 2)
+breaks_resp <- seq(20, 26, by = 1)
 
-n_bins_hr <- length(breaks_hr) - 1
-n_bins_resp <- length(breaks_resp) - 1
+n_bins_hr <- length(breaks_hr) - 1 # Number of bins for HR
+n_bins_resp <- length(breaks_resp) - 1 # Number of bins for RESP
 
 ```
 
@@ -115,17 +116,21 @@ buffer_history <- list()
 ### Stream processing (iterative step) - MANUAL APPROACH
 
 ```{r}
+# Animation of the evolution of grid counters for the four window models
 saveGIF({
 
-par(mfrow=c(2,2))
+par(mfrow=c(2,2)) # Set up a 2x2 plotting area for the four grid visualizations
 
+# Iterate through the stream points
 for(i in 1:iterations){
 
   # Retrieve one point from the stream
   pt <- get_points(stream_2d,1)
-
+  
+  # If the stream has ended, break the loop
   if(nrow(pt)==0) break
 
+  # Convert the retrieved point to numeric values for HR and RESP
   hr_val <- as.numeric(pt[1,1])
   resp_val <- as.numeric(pt[1,2])
 
@@ -201,54 +206,58 @@ for(i in 1:iterations){
   # VISUALIZATION
   # --------------------------------------------------------
 
-  image(grid_landmark,
+  image(x = breaks_hr, y = breaks_resp, z = grid_landmark,
         main="Landmark Window",
-        xlab="HR bins",
-        ylab="RESP bins")
+        xlab="Heart Rate (BPM)",
+        ylab="Respiration Rate")
 
-  image(grid_sliding,
+  image(x = breaks_hr, y = breaks_resp, z = grid_sliding,
         main="Sliding Window",
-        xlab="HR bins",
-        ylab="RESP bins")
+        xlab="Heart Rate (BPM)",
+        ylab="Respiration Rate")
 
-  image(grid_weighted,
+  image(x = breaks_hr, y = breaks_resp, z = grid_weighted,
         main="Weighted Window",
-        xlab="HR bins",
-        ylab="RESP bins")
+        xlab="Heart Rate (BPM)",
+        ylab="Respiration Rate")
 
-  image(grid_fading,
+  image(x = breaks_hr, y = breaks_resp, z = grid_fading,
         main="Fading Window",
-        xlab="HR bins",
-        ylab="RESP bins")
+        xlab="Heart Rate (BPM)",
+        ylab="Respiration Rate")
 
 }
 
 }, interval=0.2)
-  
-```
 
+```
 ### Reseting stream before 2nd approach
 
 ```{r}
 reset_stream(stream_2d)
 ```
 
+## 2)  Use of built-in models from the 'stream' package
+
 ### Stream processing (iterative step) - USING BUILT-IN MODELS FROM 'stream' PACKAGE
 
 ```{r}
+# Lambda value for fading models (D-Stream with decay and weighted sliding window)
+
+lambda_value <- -log(eps) / w
 
 # These models implement micro-cluster algorithms internally.
 
 # Landmark-like behaviour (no fading)
 dsc_landmark <- DSC_DStream(
-  gridsize = 5,
+  gridsize = 1,
   lambda = 0
 )
 
 # Fading model (D-Stream with decay)
 dsc_fading <- DSC_DStream(
-  gridsize = 5,
-  lambda = 0.01
+  gridsize = 1,
+  lambda = lambda_value
 )
 
 # Strict sliding window model
@@ -259,11 +268,11 @@ dsc_sliding <- DSC_Window(
 # Weighted sliding window model
 dsc_weighted <- DSC_Window(
   horizon = 100,
-  lambda = 0.01
+  lambda = lambda_value
 )
 ```
 
-# Animation of the evolution of micro-clusters (D-Stream Fading Model)
+### Animation of the evolution of micro-clusters (D-Stream Fading Model)
 
 ```{r}
 ani.options(interval = 0.2)
@@ -289,17 +298,8 @@ img.name = "stream_grid_animation",
 htmlfile = "evolucao_grelha.html")
 ```
 
-# Explore and update other models
+# Close stream connection
 
 ```{r}
-# Sempre que necessitar de reavaliar o mesmo fluxo do início, faça reset:
-reset_stream(stream_data)
-
-update(dsc_sliding, stream_data, n = 1000)
-
-cat("\n--- Centros da Janela Deslizante (Primeiros 6) ---\n")
-print(head(get_centers(dsc_sliding)))
-
-# Close stream connection
-close_stream(stream_data)
+close_stream(stream_2d)
 ```
