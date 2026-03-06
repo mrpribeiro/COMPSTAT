@@ -130,10 +130,6 @@ for(i in 1:iterations){
   # If the stream has ended, break the loop
   if(nrow(pt)==0) break
 
-  # Convert the retrieved point to numeric values for HR and RESP
-  hr_val <- as.numeric(pt[1,1])
-  resp_val <- as.numeric(pt[1,2])
-
   # Skip missing sensor readings
   if(is.na(hr_val) || is.na(resp_val)) next
 
