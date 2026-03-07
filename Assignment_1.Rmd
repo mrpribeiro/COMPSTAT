@@ -422,7 +422,7 @@ saveGIF({
       # PLOT 2: Dashboard Info
       # Displays current iteration/occurrence count
       plot.new()
-      text(0.5, 0.6, paste("Occurrence: ", i), cex = 2, font = 2)
+      text(0.5, 0.6, paste("Observation: ", i), cex = 2, font = 2)
               
       # PLOT 3: Landmark Window (Infinite Memory)
       # All historical points are plotted with low alpha to show density
@@ -459,12 +459,114 @@ saveGIF({
     }
   }
   # Global title for the animation
-  title("Memory Models Comparison in Data Streams", outer = TRUE)
+  title("Memory Models Comparison in Data Streams - Heart Rate", outer = TRUE)
   
-}, movie.name = "attractors_comparison.gif", interval = 0.1)
+}, movie.name = "attractors_comparison_hr.gif", interval = 0.1)
 ```
 
 Phase-Space reconstruction ($x_t$ vs $x_{t-5}$) of heart rate data. The visualization contrasts infinite memory (Landmark) against discrete (Sliding) and fading (Exponential/Linear) models, demonstrating the trade-off between historical density and temporal reactivity.
+The Landmark model preserves the global trajectory at the cost of high memory consumption, whereas the Sliding window provides a computationally efficient but discrete snapshot of the last 50 iterations (in this case). To address the loss of temporal nuance in uniform weighting, the Fading and Weighted models were implemented; the former employs an exponential decay to maintain a smooth historical trace, while the latter uses a linear gradient to phase out the relevance of aging data points, exibiting similar behaviour.
+
+```{r}
+reset_stream(stream_2d)
+```
+
+```{r}
+# ---------------------------------------------------------
+# Respiratory Rate in Phase-Space: Comparative Memory Models
+# ---------------------------------------------------------
+
+
+# 1. Reset and Pre-fill the buffer
+reset_stream(stream_2d)
+tau <- 20               # Time delay (lag) - around 4 times more heart beats than respiratory cicles
+w_sliding <- 80        # Sliding window size - bigger than the heart rate
+alpha_fading <- 0.95   
+history_resp <- numeric()
+
+# PRE-FETCHING PHASE: Collect the first 'tau' points before recording, resolving waiting times for the GIF
+for(p in 1:tau) {
+  pt_initial <- get_points(stream_2d, 1)
+  if(nrow(pt_initial) > 0) {
+    history_resp <- c(history_resp, pt_initial[[1, 2]])
+  }
+}
+
+# 2. Recording Phase (Starts exactly at tau + 1)
+saveGIF({
+  # Setup 3x2 grid layout
+  par(mfrow = c(3, 2), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
+  
+  # Adjust loop to account for already consumed points
+  remaining_iters <- iterations - tau
+  
+  for(i in 1:remaining_iters) {
+    # Data Ingestion
+    pt <- get_points(stream_2d, 1)
+    if(nrow(pt) == 0) break
+    resp_val <- pt[[1, 2]]
+    if(is.na(resp_val)) next
+    
+    # Update Buffer
+    history_resp <- c(history_resp, resp_val)
+    curr_idx <- length(history_resp)
+    
+    # Calculate Embedding Coordinates
+    # Current (t) and Delayed (t - tau)
+    xt     <- history_resp[(tau + 1):curr_idx]
+    xt_lag <- history_resp[1:(curr_idx - tau)]
+    n_pts  <- length(xt)
+
+    # --- ROW 1: Control and Metadata ---
+    
+    # PLOT 1: Real-Time State (Current lag-coordinate)
+    plot(xt_lag[n_pts], xt[n_pts], pch = 17, col = "red", cex = 2.5,
+         main = "1. Real-Time (Current State)", xlab = "RR(t-20)", ylab = "RR(t)",
+         xlim = range(breaks_resp), ylim = range(breaks_resp))
+    abline(0, 1, lty = 3, col = "gray")
+
+    # PLOT 2: Status Dashboard
+    plot.new()
+    text(0.5, 0.6, paste("Observation:", i + tau), cex = 2, font = 2)
+    
+
+    # --- ROW 2: Discrete Memory Models ---
+    
+    # PLOT 3: Landmark (Cumulative Density)
+    plot(xt_lag, xt, pch = 16, col = rgb(0.2, 0.2, 0.2, 0.2), 
+         main = "2. Landmark", xlab = "RR(t-20)", ylab = "RR(t)",
+         xlim = range(breaks_resp), ylim = range(breaks_resp))
+
+    # PLOT 4: Sliding Window (Recent Trajectory)
+    idx_s <- max(1, n_pts - w_sliding + 1)
+    plot(xt_lag[idx_s:n_pts], xt[idx_s:n_pts], pch = 16, col = "blue", 
+         main = paste("3. Sliding (w =", w_sliding, ")"),
+         xlab = "RR(t-20)", ylab = "RR(t)",
+         xlim = range(breaks_resp), ylim = range(breaks_resp))
+
+    # --- ROW 3: Continuous Decay Models ---
+    
+    # PLOT 5: Fading Window (Exponential Obsolescence)
+    weights_f = alpha_fading^((n_pts:1) - 1)
+    plot(xt_lag, xt, pch = 16, col = rgb(1, 0.5, 0, alpha = weights_f), 
+         main = "4. Fading", xlab = "RR(t-20)", ylab = "RR(t)",
+         xlim = range(breaks_resp), ylim = range(breaks_resp))
+
+    # PLOT 6: Weighted Window (Linear Obsolescence)
+    # Using 'horizon_linear' to define when a point's weight reaches zero
+    weights_w = pmax(0, (100 - (n_pts:1)) / 100)
+    plot(xt_lag, xt, pch = 16, col = rgb(0.5, 0, 0.5, alpha = weights_w), 
+         main = "5. Weighted", xlab = "RR(t-20)", ylab = "RR(t)",
+         xlim = range(breaks_resp), ylim = range(breaks_resp))
+    
+  }
+  # Global title for the animation
+  title("Memory Models Comparison in Data Streams - Respiratory Rate", outer = TRUE)
+    
+}, movie.name = "attractors_comparison_rr.gif", interval = 0.2)
+```
+
+Comparative analysis of Respiratory Rate attractors in Phase-Space ($x_t$ vs $x_{t-20}$). This dashboard illustrates the impact of different windowing models (Landmark, Sliding, Fading, and Weighted) on slow-oscillating biological signals. The $\tau=20$ setting ensures proper topological unfolding of the respiratory attractor. The windowing models behavior is the same as the Heart Rate, showing it's consistency.
 
 # Close stream connection
 ```{r}
