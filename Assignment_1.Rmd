@@ -238,7 +238,7 @@ for(i in 1:iterations){
 ```
 
 ```{r}
-#Still graph
+#Static graph
 
 # Reset stream (optional?)
 reset_stream(stream_2d)
