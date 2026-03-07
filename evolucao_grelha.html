@@ -1,0 +1,36 @@
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="generator" content="R package animation 2.8">
+	<title>Animations Using the R Language</title>
+	<link rel="stylesheet" href="css/reset.css" />
+	<link rel="stylesheet" href="css/styles.css" />
+	<link rel="stylesheet" href="css/scianimator.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+
+	<script src="js/jquery-1.4.4.min.js"></script>
+	<script src="js/jquery.scianimator.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+<body>
+
+	<div class="scianimator"><div id="stream_grid_animation" style="display: inline-block;"></div></div>
+	<div class="scianimator" style="width: 480px; text-align: left"><pre><code class="r">## Animations generated in R version 4.5.2 (2025-10-31
+##   ucrt) using the package animation
+library(animation)
+library(stream)
+animate_cluster(dsc_fading, stream_2d, horizon = 100, n = 2000, 
+    plot.args = list(type = "both", grid = TRUE, xlim = c(40, 
+        140), ylim = c(0, 40), xlab = "Heart Rate (HR)", 
+        ylab = "Respiratory Rate (RESP)", main = "2D Grid Evolution (D-Stream Fading Model)"))
+## R version 4.5.2 (2025-10-31 ucrt)
+## Platform: x86_64-w64-mingw32/x64
+## Other packages: animation 2.8, stream 2.0-3</code></pre></div>
+	<script src="js/stream_grid_animation.js"></script>
+<!-- highlight R code -->
+
+</body>
+</html>

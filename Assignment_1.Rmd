@@ -18,8 +18,8 @@ The original data was acquired from **critically-ill patients** during hospital 
 
 ```{r}
 # Install packages
-#install.packages("stream")
-#install.packages("animation")
+install.packages("stream")
+install.packages("animation")
 
 # Load libraries
 library(stream)
@@ -126,6 +126,11 @@ for(i in 1:iterations){
 
   # Retrieve one point from the stream
   pt <- get_points(stream_2d,1)
+
+  #Definition of features
+  # column 1 -  HR, column 2 - RESP
+  hr_val   <- pt[[1, 1]] 
+  resp_val <- pt[[1, 2]]
   
   # If the stream has ended, break the loop
   if(nrow(pt)==0) break
