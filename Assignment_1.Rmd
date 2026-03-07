@@ -238,7 +238,7 @@ for(i in 1:iterations){
 ```
 
 ```{r}
-#Still graph
+#Static graph
 
 # Reset stream (optional?)
 reset_stream(stream_2d)
@@ -342,6 +342,7 @@ dsc_weighted <- DSC_Window(
 )
 ```
 
+
 ### Animation of the evolution of micro-clusters (D-Stream Fading Model)
 
 ```{r}
@@ -368,8 +369,104 @@ img.name = "stream_grid_animation",
 htmlfile = "evolucao_grelha.html")
 ```
 
-# Close stream connection
+```{r}
+reset_stream(stream_2d)
+```
 
+### Animations in phase space
+```{r}
+# ---------------------------------------------------------
+# Heart Rate in Phase-Space: Comparative Memory Models
+# ---------------------------------------------------------
+
+# Parameters for Phase-Space and Windows
+tau <- 5               # Time delay (lag) to unfold the attractor
+w_sliding <- 50        # Fixed window size for Sliding Window
+alpha_fading <- 0.95   # Exponential decay factor for Fading Window
+horizon_linear <- 100  # Cut-off horizon for Linear Weighted Window
+history_hr <- numeric() # Buffer to store HR values for lag calculation
+
+saveGIF({
+  # Setup a 3x2 grid layout
+  # mar: margins, oma: outer margins for the main title
+  par(mfrow = c(3, 2), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
+  
+  for(i in 1:iterations) {
+    # 1. Data Ingestion: Retrieve 1 point from the stream
+    pt <- get_points(stream_2d, 1)
+    if(nrow(pt) == 0) break
+    hr_val <- pt[[1, 1]]
+    if(is.na(hr_val)) next
+    
+    # 2. History Management: Update the buffer
+    history_hr <- c(history_hr, hr_val)
+    curr_idx <- length(history_hr)
+    
+    # 3. Guard Clause: Wait until enough data is collected for the 'tau' lag
+    if(curr_idx > tau) {
+      
+      # Define coordinates for Embedding: x(t) vs x(t - tau)
+      xt     <- history_hr[(tau + 1):curr_idx]
+      xt_lag <- history_hr[1:(curr_idx - tau)]
+      n_pts  <- length(xt)
+
+      # --- Visualizations ---
+
+      # PLOT 1: Real-Time State (The "Present" moment)
+      # Represents the current coordinates in the state space
+      plot(xt_lag[n_pts], xt[n_pts], pch = 4, col = "red", cex = 2.5,
+           main = "1. Real Time (Current State)", xlab = "HR(t-5)", ylab = "HR(t)",
+           xlim = range(breaks_hr), ylim = range(breaks_hr))
+      abline(0, 1, lty = 3, col = "gray") # Identity line for reference
+
+      # PLOT 2: Dashboard Info
+      # Displays current iteration/occurrence count
+      plot.new()
+      text(0.5, 0.6, paste("Occurrence: ", i), cex = 2, font = 2)
+              
+      # PLOT 3: Landmark Window (Infinite Memory)
+      # All historical points are plotted with low alpha to show density
+      plot(xt_lag, xt, pch = 16, col = rgb(0.2, 0.2, 0.2, 0.2), 
+           main = "2. Landmark", xlab = "HR(t-5)", ylab = "HR(t)",
+           xlim = range(breaks_hr), ylim = range(breaks_hr))
+
+      # PLOT 4: Sliding Window (Finite Discrete Memory)
+      # Displays only the last 'w' points to show local dynamics
+      idx_s <- max(1, n_pts - w_sliding + 1)
+      plot(xt_lag[idx_s:n_pts], xt[idx_s:n_pts], pch = 16,
+           col = "blue", main = paste("3. Sliding (w =", w_sliding, ")"),
+           xlab = "HR(t-5)", ylab = "HR(t)",
+           xlim = range(breaks_hr), ylim = range(breaks_hr))
+
+      # PLOT 5: Fading Window (Exponential Decay)
+      # Points fade out smoothly according to the alpha^distance formula
+      weights_fading <- alpha_fading^((n_pts:1) - 1)
+      plot(xt_lag, xt, pch = 16, col = rgb(1, 0.5, 0, alpha = weights_fading), 
+           main = "4. Fading", xlab = "HR(t-5)", ylab = "HR(t)",
+           xlim = range(breaks_hr), ylim = range(breaks_hr))
+
+      # PLOT 6: Weighted Window (Linear Decay)
+      # Points lose weight linearly until they vanish at the horizon
+      weights_weighted <- pmax(0, (horizon_linear - (n_pts:1)) / horizon_linear)
+      plot(xt_lag, xt, pch = 16, col = rgb(0.5, 0, 0.5, alpha = weights_weighted), 
+           main = "5. Weighted", xlab = "HR(t-5)", ylab = "HR(t)",
+           xlim = range(breaks_hr), ylim = range(breaks_hr))
+      
+    } else {
+      # Warm-up phase: The system is collecting the initial 'tau' points
+      for(j in 1:6) { plot.new() }
+      text(0.5, 0.5, "Starting stream: Collecting lag data...", cex = 1.2)
+    }
+  }
+  # Global title for the animation
+  title("Memory Models Comparison in Data Streams", outer = TRUE)
+  
+}, movie.name = "attractors_comparison.gif", interval = 0.1)
+```
+
+Phase-Space reconstruction ($x_t$ vs $x_{t-5}$) of heart rate data. The visualization contrasts infinite memory (Landmark) against discrete (Sliding) and fading (Exponential/Linear) models, demonstrating the trade-off between historical density and temporal reactivity.
+
+# Close stream connection
 ```{r}
 close_stream(stream_2d)
 ```

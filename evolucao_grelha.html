@@ -24,7 +24,7 @@ library(dplyr)
 library(ggplot2)
 library(animation)
 library(stream)
-animate_cluster(dsc_fading, stream_2d, horizon = 100, n = 481, 
+animate_cluster(dsc_fading, stream_2d, horizon = 100, n = 2000, 
     plot.args = list(type = "both", grid = TRUE, xlim = c(40, 
         140), ylim = c(0, 40), xlab = "Heart Rate (HR)", 
         ylab = "Respiratory Rate (RESP)", main = "2D Grid Evolution (D-Stream Fading Model)"))
