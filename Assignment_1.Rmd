@@ -250,7 +250,7 @@ reset_stream(stream_2d)
 w <- 100           # Sliding window size
 eps <- 0.05         # Error tolerance
 alpha_fading <- eps^(1/w)  # Exponential decay factor
-horizon_linear <- 100  # Cut-off horizon for Linear Weighted Window
+horizon_linear <- 50  # Cut-off horizon for Linear Weighted Window
 
 history_hr     <- numeric() # Buffer to store Heart Rate values
 history_resp     <- numeric() # Buffer to store RR Interval values
@@ -294,7 +294,7 @@ saveGIF({
     plot.new()
     text(0.5, 0.7, paste("Observation:", i), cex = 1.8, font = 2)
     text(0.5, 0.4, paste("HR:", round(hr_val, 1), "bpm"), cex = 1.2)
-    text(0.5, 0.2, paste("RR:", round(resp_val, 3), "s"), cex = 1.2)
+    text(0.5, 0.2, paste("RR:", round(resp_val, 3), "cpm"), cex = 1.2)
 
     # PLOT 3: Landmark Window (Infinite Memory)
     # Cumulative plot of all historical points with transparency to show density
@@ -348,7 +348,7 @@ lambda_value <- -log(eps) / w
 # Landmark-like behaviour (no fading)
 dsc_landmark <- DSC_DStream(
   gridsize = 1,
-  lambda = 0
+  lambda = 0.001 # Very small lambda to approximate no decay
 )
 
 # Fading model (D-Stream with decay)
@@ -359,21 +359,23 @@ dsc_fading <- DSC_DStream(
 
 # Strict sliding window model
 dsc_sliding <- DSC_Window(
-  horizon = 100
+  horizon = 50
 )
 
 # Weighted sliding window model
 dsc_weighted <- DSC_Window(
-  horizon = 100,
+  horizon = 50,
   lambda = lambda_value
 )
 ```
 
 
-### Animation of the evolution of micro-clusters (D-Stream Fading Model)
+### Animation of the evolution of micro-clusters (D-Stream 4 Models)
 
 
 ```{r}
+###LANDMARK
+
 ani.options(interval = 0.5)
 
 # Reset stream)
@@ -384,13 +386,13 @@ saveGIF({
     animate_cluster(
     dsc_landmark,             
     stream_2d, 
-    horizon = 100,          
-    n = 2000,               
+    horizon = 50,          
+    n = 481,               
     plot.args = list(
       type = "auto",        
       grid = TRUE,          
-      xlim = c(40, 140),    
-      ylim = c(0, 40),      
+      xlim = lim_hr,    
+      ylim = lim_resp,      
       xlab = "Heart Rate (HR)",
       ylab = "Respiratory Rate (RESP)",
       main = "D-Stream Landmark Model"
@@ -404,6 +406,8 @@ clean = TRUE
 ```
 
 ```{r}
+###SLIDING
+
 
 # Reset stream)
 reset_stream(stream_2d)
@@ -413,16 +417,16 @@ saveGIF({
     animate_cluster(
     dsc_sliding,             
     stream_2d, 
-    horizon = 100,          
-    n = 2000,               
+    horizon = 50,          
+    n = 481,               
     plot.args = list(
-      type = "auto",        
+      type = "auto",       
       grid = TRUE,          
-      xlim = c(40, 140),    
-      ylim = c(0, 40),      
+      xlim = lim_hr,    
+      ylim = lim_resp,      
       xlab = "Heart Rate (HR)",
       ylab = "Respiratory Rate (RESP)",
-      main = "D-Stream Fading Model"
+      main = "D-Stream Sliding Model"
     )
   )
 }, 
@@ -432,6 +436,9 @@ clean = TRUE
 )
 ```
 ```{r}
+
+###FADING
+
 # Reset stream)
 reset_stream(stream_2d)
 
@@ -440,13 +447,13 @@ saveGIF({
     animate_cluster(
     dsc_fading,             
     stream_2d, 
-    horizon = 100,          
-    n = 2000,               
+    horizon = 50,          
+    n = 481,               
     plot.args = list(
       type = "auto",        
       grid = TRUE,          
-      xlim = c(40, 140),    
-      ylim = c(0, 40),      
+      xlim = lim_hr,    
+      ylim = lim_resp,      
       xlab = "Heart Rate (HR)",
       ylab = "Respiratory Rate (RESP)",
       main = "D-Stream Fading Model"
@@ -460,6 +467,8 @@ clean = TRUE
 ```
 
 ```{r}
+###WEIGHTED
+
 # Reset stream)
 reset_stream(stream_2d)
 
@@ -468,13 +477,13 @@ saveGIF({
     animate_cluster(
     dsc_weighted,             
     stream_2d, 
-    horizon = 100,          
-    n = 2000,               
+    horizon = 50,          
+    n = 481,               
     plot.args = list(
       type = "auto",        
       grid = TRUE,          
-      xlim = c(40, 140),    
-      ylim = c(0, 40),      
+      xlim = lim_hr,    
+      ylim = lim_resp,      
       xlab = "Heart Rate (HR)",
       ylab = "Respiratory Rate (RESP)",
       main = "D-Stream Weighted Model"
@@ -487,6 +496,55 @@ clean = TRUE
 )
 ```
 
+### Comparative animation of all 4 models in a 2x2 grid layout
+
+```{r}
+reset_stream(stream_2d)
+
+saveGIF({
+  
+  # animate_cluster() can't show the 4 plots in the same grid 2x2, so we need to do it manually
+  for(i in seq(horizon, n, by = horizon)) {
+    
+    points <- get_points(stream_2d, n = horizon)
+    if(nrow(points) == 0) break
+    
+    # Same points in every graph
+    update(dsc_landmark, points)
+    update(dsc_sliding,  points)
+    update(dsc_fading,   points)
+    update(dsc_weighted, points)
+    
+    # Layout
+    par(mfrow = c(2, 2), mar = c(4, 4, 3, 1), oma = c(0, 0, 3, 0))
+    
+    plot_args_base <- list(
+      type = "auto", 
+      grid = TRUE, 
+      xlim = lim_hr, 
+      ylim = lim_resp,
+      xlab = "HR", 
+      ylab = "RESP",
+      axes = TRUE
+    )
+    
+    # 5. Aplly plots
+  
+    do.call(plot, c(list(dsc_landmark, main = "Landmark"), plot_args_base))
+    do.call(plot, c(list(dsc_sliding,  main = "Sliding"),  plot_args_base))
+    do.call(plot, c(list(dsc_fading,   main = "Fading"),   plot_args_base))
+    do.call(plot, c(list(dsc_weighted, main = "Weighted"), plot_args_base))
+    
+    # Title by frame
+    mtext(paste("Comparison of Stream Models - Observation:", i), 
+          outer = TRUE, cex = 1.2, font = 2)
+  }
+  
+}, 
+movie.name = "combined_micro_clusters_2x2.gif", 
+img.name = "combined_frame", 
+clean = TRUE)
+```
 # Close stream connection
 ```{r}
 close_stream(stream_2d)
