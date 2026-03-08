@@ -372,35 +372,120 @@ dsc_weighted <- DSC_Window(
 
 ### Animation of the evolution of micro-clusters (D-Stream Fading Model)
 
-```{r}
-ani.options(interval = 0.2)
 
-saveHTML({
-  animate_cluster(
+```{r}
+ani.options(interval = 0.5)
+
+# Reset stream)
+reset_stream(stream_2d)
+
+# Landmark microclusters animation
+saveGIF({
+    animate_cluster(
+    dsc_landmark,             
+    stream_2d, 
+    horizon = 100,          
+    n = 2000,               
+    plot.args = list(
+      type = "auto",        
+      grid = TRUE,          
+      xlim = c(40, 140),    
+      ylim = c(0, 40),      
+      xlab = "Heart Rate (HR)",
+      ylab = "Respiratory Rate (RESP)",
+      main = "D-Stream Landmark Model"
+    )
+  )
+}, 
+movie.name = "micro_clusters_landmark.gif", 
+img.name = "stream_grid_frame_land",   
+clean = TRUE                      
+)
+```
+
+```{r}
+
+# Reset stream)
+reset_stream(stream_2d)
+
+# Sliding microclusters animation
+saveGIF({
+    animate_cluster(
+    dsc_sliding,             
+    stream_2d, 
+    horizon = 100,          
+    n = 2000,               
+    plot.args = list(
+      type = "auto",        
+      grid = TRUE,          
+      xlim = c(40, 140),    
+      ylim = c(0, 40),      
+      xlab = "Heart Rate (HR)",
+      ylab = "Respiratory Rate (RESP)",
+      main = "D-Stream Fading Model"
+    )
+  )
+}, 
+movie.name = "micro_clusters_sliding.gif", 
+img.name = "stream_grid_frame_slid",   
+clean = TRUE                      
+)
+```
+```{r}
+# Reset stream)
+reset_stream(stream_2d)
+
+# Fading microclusters animation
+saveGIF({
+    animate_cluster(
     dsc_fading,             
     stream_2d, 
     horizon = 100,          
     n = 2000,               
     plot.args = list(
-      type = "both",        
+      type = "auto",        
       grid = TRUE,          
-      xlim = c(40, 140),  # Adjust the expected scale for HR
-      ylim = c(0, 40),    # Adjust the expected scale for RESP
+      xlim = c(40, 140),    
+      ylim = c(0, 40),      
       xlab = "Heart Rate (HR)",
       ylab = "Respiratory Rate (RESP)",
-      main = "2D Grid Evolution (D-Stream Fading Model)"
+      main = "D-Stream Fading Model"
     )
   )
-},
-img.name = "stream_grid_animation",
-htmlfile = "evolucao_grelha.html")
+}, 
+movie.name = "micro_clusters_fading.gif", 
+img.name = "stream_grid_frame_fad",   
+clean = TRUE                      
+)
 ```
 
 ```{r}
+# Reset stream)
 reset_stream(stream_2d)
+
+# Weighted microclusters animation
+saveGIF({
+    animate_cluster(
+    dsc_weighted,             
+    stream_2d, 
+    horizon = 100,          
+    n = 2000,               
+    plot.args = list(
+      type = "auto",        
+      grid = TRUE,          
+      xlim = c(40, 140),    
+      ylim = c(0, 40),      
+      xlab = "Heart Rate (HR)",
+      ylab = "Respiratory Rate (RESP)",
+      main = "D-Stream Weighted Model"
+    )
+  )
+}, 
+movie.name = "micro_clusters_weighted.gif", 
+img.name = "stream_grid_frame_weight",   
+clean = TRUE                      
+)
 ```
-
-
 
 # Close stream connection
 ```{r}
