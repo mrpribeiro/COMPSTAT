@@ -71,7 +71,7 @@ Two approaches are implemented:
 
 The data stream consists of two physiological variables: - Heart Rate (HR) and Respiratory Rate (RESP).
 
-## 1)  Manual implementation of grid-cell counters
+## 1) Manual implementation of grid-cell counters
 
 ```{r}
 # Create a single 2-dimensional stream with HR and RESP directly from the file
@@ -93,10 +93,16 @@ alpha <- eps^(1/w)  # Exponential decay factor
 iterations <- 481  # Number of stream points processed
 
 # Define Equal-Width Grid-Cells 
-# X-Axis: HR - typically between 0 and 200 bpm, bin size 10
+# X-Axis: HR - typically between 0 and 200 bpm
+# Y-Axis: RESP - typically between 0 and 60 breaths/min
 breaks_hr <- seq(88, 95, by = 1)
-# Y-Axis: RESP - typically between 0 and 60 breaths/min, bin size 2
 breaks_resp <- seq(20, 26, by = 1)
+  # THEORETICAL NOTE: 
+  # We deliberately narrowed the global physiological bounds
+  # to a restricted interval to act as a visual "zoom". 
+  # This enhances the clarity of the micro-cluster animation,
+  # recognizing the trade-off that extreme outliers would be 
+  # forced into the boundary cells.
 
 n_bins_hr <- length(breaks_hr) - 1 # Number of bins for HR
 n_bins_resp <- length(breaks_resp) - 1 # Number of bins for RESP
@@ -238,6 +244,7 @@ for(i in 1:iterations){
 ```
 
 ### Animation of comparative models (Manual)
+
 ```{r}
 
 # Reset stream)
@@ -330,11 +337,9 @@ saveGIF({
 }, movie.name = "hr_rr_memory_analysis.gif", interval = 0.1)
 ```
 
-The visualization contrasts infinite memory (Landmark) against discrete (Sliding) and fading (Fading/Weighted) models, demonstrating the trade-off between historical density and temporal reactivity.
-The Landmark model preserves the global trajectory at the cost of high memory consumption, whereas the Sliding window provides a computationally efficient but discrete snapshot of the last 100 iterations (in this case). To address the loss of temporal nuance in uniform weighting, the Fading and Weighted models were implemented; the former employs an exponential decay to maintain a smooth historical trace, while the latter uses a linear gradient to phase out the relevance of aging data points, exibiting similar behaviour.
+The visualization contrasts infinite memory (Landmark) against discrete (Sliding) and fading (Fading/Weighted) models, demonstrating the trade-off between historical density and temporal reactivity. The Landmark model preserves the global trajectory at the cost of high memory consumption, whereas the Sliding window provides a computationally efficient but discrete snapshot of the last 100 iterations (in this case). To address the loss of temporal nuance in uniform weighting, the Fading and Weighted models were implemented; the former employs an exponential decay to maintain a smooth historical trace, while the latter uses a linear gradient to phase out the relevance of aging data points, exibiting similar behaviour.
 
-
-## 2)  Use of built-in models from the 'stream' package
+## 2) Use of built-in models from the 'stream' package
 
 ### Stream processing (iterative step) - USING BUILT-IN MODELS FROM 'stream' PACKAGE
 
@@ -369,9 +374,7 @@ dsc_weighted <- DSC_Window(
 )
 ```
 
-
 ### Animation of the evolution of micro-clusters (D-Stream 4 Models)
-
 
 ```{r}
 ###LANDMARK
@@ -435,6 +438,7 @@ img.name = "stream_grid_frame_slid",
 clean = TRUE                      
 )
 ```
+
 ```{r}
 
 ###FADING
@@ -545,7 +549,9 @@ movie.name = "combined_micro_clusters_2x2.gif",
 img.name = "combined_frame", 
 clean = TRUE)
 ```
+
 # Close stream connection
+
 ```{r}
 close_stream(stream_2d)
 ```
