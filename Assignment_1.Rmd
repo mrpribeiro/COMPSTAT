@@ -71,7 +71,7 @@ Two approaches are implemented:
 
 The data stream consists of two physiological variables: - Heart Rate (HR) and Respiratory Rate (RESP).
 
-## 1) Manual implementation of grid-cell counters
+## Stream creation
 
 ```{r}
 # Create a single 2-dimensional stream with HR and RESP directly from the file
@@ -82,34 +82,127 @@ stream_2d <- DSD_ReadCSV("bidmc_01_Numerics.csv",
                            take = c(2, 4)) # HR and RESP column indices
 ```
 
+## Animation of comparative models
+
+```{r}
+
+# Reset stream)
+reset_stream(stream_2d)
+# ---------------------------------------------------------
+# Comparative Memory Models
+# ---------------------------------------------------------
+
+# Parameters for Phase-Space and Windows
+w <- 100           # Sliding window size
+eps <- 0.05         # Error tolerance
+alpha_fading <- eps^(1/w)  # Exponential decay factor
+horizon_linear <- 50  # Cut-off horizon for Linear Weighted Window
+
+history_hr     <- numeric() # Buffer to store Heart Rate values
+history_resp     <- numeric() # Buffer to store RR Interval values
+
+saveGIF({
+  # Setup a 3x2 grid layout
+  # mar: margins, oma: outer margins for the main title
+  par(mfrow = c(3, 2), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
+  
+  for(i in 1:iterations) {
+    # 1. Data Ingestion: Retrieve 1 point from the stream
+    pt <- get_points(stream_2d, 1)
+    if(nrow(pt) == 0) break
+    
+    hr_val  <- pt[[1, 1]]
+    resp_val  <- pt[[1, 2]] 
+    
+    # Skip missing sensor readings to maintain data integrity
+    if(is.na(hr_val) || is.na(resp_val)) next
+    
+    # 2. History Management: Update the buffers
+    history_hr <- c(history_hr, hr_val)
+    history_resp <- c(history_resp, resp_val)
+    n_pts      <- length(history_hr)
+    
+    # Define fixed axis limits for visual consistency across frames
+    lim_hr <- range(breaks_hr) 
+    lim_resp <- range(breaks_resp) 
+
+    # --- Visualizations ---
+
+    # PLOT 1: Real-Time State
+    # Represents the "Now": the most recent observation in the phase space
+    plot(hr_val, resp_val, pch = 4, col = "red", cex = 2.5, lwd = 2,
+         main = "1. Real Time (Current State)", xlab = "HR (bpm)", ylab = "RR (s)",
+         xlim = lim_hr, ylim = lim_resp)
+    grid()
+
+    # PLOT 2: Dashboard Info
+    # Textual representation of the current stream iteration
+    plot.new()
+    text(0.5, 0.7, paste("Observation:", i), cex = 1.8, font = 2)
+    text(0.5, 0.4, paste("HR:", round(hr_val, 1), "bpm"), cex = 1.2)
+    text(0.5, 0.2, paste("RR:", round(resp_val, 3), "cpm"), cex = 1.2)
+
+    # PLOT 3: Landmark Window (Infinite Memory)
+    # Cumulative plot of all historical points with transparency to show density
+    plot(history_hr, history_resp, pch = 16, col = rgb(0.2, 0.2, 0.2, 0.1), 
+         main = "2. Landmark (Infinite Memory)", xlab = "HR", ylab = "RR",
+         xlim = lim_hr, ylim = lim_resp)
+
+    # PLOT 4: Sliding Window (Finite Discrete Memory)
+    # Only the last 'w' points are kept; older data is completely discarded
+    idx_s <- max(1, n_pts - w + 1)
+    plot(history_hr[idx_s:n_pts], history_resp[idx_s:n_pts], pch = 16,
+         col = "blue", main = paste("3. Sliding (w =", w, ")"),
+         xlab = "HR", ylab = "RR", xlim = lim_hr, ylim = lim_resp)
+
+    # PLOT 5: Fading Window (Exponential Decay)
+    # Points fade out smoothly; the weight of history decreases geometrically
+    weights_fading <- alpha_fading^((n_pts:1) - 1)
+    plot(history_hr, history_resp, pch = 16, col = rgb(1, 0.5, 0, alpha = weights_fading), 
+         main = "4. Fading (Exponential Decay)", xlab = "HR", ylab = "RR",
+         xlim = lim_hr, ylim = lim_resp)
+
+    # PLOT 6: Weighted Window (Linear Decay)
+    # Points lose weight linearly until they reach the 'horizon' and disappear
+    weights_linear <- pmax(0, (horizon_linear - (n_pts:1 - 1)) / horizon_linear)
+    plot(history_hr, history_resp, pch = 16, col = rgb(0.5, 0, 0.5, alpha = weights_linear), 
+         main = "5. Weighted (Linear Decay)", xlab = "HR", ylab = "RR",
+         xlim = lim_hr, ylim = lim_resp)
+  }
+  
+  # Global title for the animation across all subplots
+  title("Stream Memory Models Comparison: HR vs RR Correlation", outer = TRUE)
+  
+}, movie.name = "hr_rr_memory_analysis.gif", interval = 0.1)
+```
+
+The visualization contrasts infinite memory (Landmark) against discrete (Sliding) and fading (Fading/Weighted) models, demonstrating the trade-off between historical density and temporal reactivity.
+The Landmark model preserves the global trajectory at the cost of high memory consumption, whereas the Sliding window provides a computationally efficient but discrete snapshot of the last 100 iterations (in this case). To address the loss of temporal nuance in uniform weighting, the Fading and Weighted models were implemented; the former employs an exponential decay to maintain a smooth historical trace, while the latter uses a linear gradient to phase out the relevance of aging data points, exibiting similar behaviour.
+
+## Manual implementation of grid-cell counters
+
 ### Parameter definition and grid setup
 
 ```{r}
 # Time window parameters
-w <- 100           # Sliding window size
+w <- 50           # Sliding window size
 eps <- 0.05         # Error tolerance
 alpha <- eps^(1/w)  # Exponential decay factor
 
 iterations <- 481  # Number of stream points processed
 
 # Define Equal-Width Grid-Cells 
-# X-Axis: HR - typically between 0 and 200 bpm
-# Y-Axis: RESP - typically between 0 and 60 breaths/min
+# X-Axis: HR - typically between 0 and 200 bpm, bin size 10
 breaks_hr <- seq(88, 95, by = 1)
+# Y-Axis: RESP - typically between 0 and 60 breaths/min, bin size 2
 breaks_resp <- seq(20, 26, by = 1)
-  # THEORETICAL NOTE: 
-  # We deliberately narrowed the global physiological bounds
-  # to a restricted interval to act as a visual "zoom". 
-  # This enhances the clarity of the micro-cluster animation,
-  # recognizing the trade-off that extreme outliers would be 
-  # forced into the boundary cells.
 
 n_bins_hr <- length(breaks_hr) - 1 # Number of bins for HR
 n_bins_resp <- length(breaks_resp) - 1 # Number of bins for RESP
 
 ```
 
-### Initialization of grid counters (manual implementation)
+### Initialization of grid counters 
 
 ```{r}
 # Each matrix represents the 2D grid where rows are HR and columns are RESP
@@ -123,7 +216,7 @@ grid_fading   <- matrix(0, nrow = n_bins_hr, ncol = n_bins_resp)
 buffer_history <- list()
 ```
 
-### Stream processing (iterative step) - MANUAL APPROACH
+### Stream processing (iterative step)
 
 ```{r}
 # Animation of the evolution of grid counters for the four window models
@@ -242,206 +335,18 @@ for(i in 1:iterations){
 }, interval=0.2)
 
 ```
-
-### Animation of comparative models (Manual)
-
-```{r}
-
-# Reset stream)
-reset_stream(stream_2d)
-# ---------------------------------------------------------
-# Comparative Memory Models
-# ---------------------------------------------------------
-
-# Parameters for Phase-Space and Windows
-w <- 100           # Sliding window size
-eps <- 0.05         # Error tolerance
-alpha_fading <- eps^(1/w)  # Exponential decay factor
-horizon_linear <- 50  # Cut-off horizon for Linear Weighted Window
-
-history_hr     <- numeric() # Buffer to store Heart Rate values
-history_resp     <- numeric() # Buffer to store RR Interval values
-
-saveGIF({
-  # Setup a 3x2 grid layout
-  # mar: margins, oma: outer margins for the main title
-  par(mfrow = c(3, 2), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
-  
-  for(i in 1:iterations) {
-    # 1. Data Ingestion: Retrieve 1 point from the stream
-    pt <- get_points(stream_2d, 1)
-    if(nrow(pt) == 0) break
-    
-    hr_val  <- pt[[1, 1]]
-    resp_val  <- pt[[1, 2]] 
-    
-    # Skip missing sensor readings to maintain data integrity
-    if(is.na(hr_val) || is.na(resp_val)) next
-    
-    # 2. History Management: Update the buffers
-    history_hr <- c(history_hr, hr_val)
-    history_resp <- c(history_resp, resp_val)
-    n_pts      <- length(history_hr)
-    
-    # Define fixed axis limits for visual consistency across frames
-    lim_hr <- range(breaks_hr) 
-    lim_resp <- range(breaks_resp) 
-
-    # --- Visualizations ---
-
-    # PLOT 1: Real-Time State
-    # Represents the "Now": the most recent observation in the phase space
-    plot(hr_val, resp_val, pch = 4, col = "red", cex = 2.5, lwd = 2,
-         main = "1. Real Time (Current State)", xlab = "HR (bpm)", ylab = "RR (s)",
-         xlim = lim_hr, ylim = lim_resp)
-    grid()
-
-    # PLOT 2: Dashboard Info
-    # Textual representation of the current stream iteration
-    plot.new()
-    text(0.5, 0.7, paste("Observation:", i), cex = 1.8, font = 2)
-    text(0.5, 0.4, paste("HR:", round(hr_val, 1), "bpm"), cex = 1.2)
-    text(0.5, 0.2, paste("RR:", round(resp_val, 3), "cpm"), cex = 1.2)
-
-    # PLOT 3: Landmark Window (Infinite Memory)
-    # Cumulative plot of all historical points with transparency to show density
-    plot(history_hr, history_resp, pch = 16, col = rgb(0.2, 0.2, 0.2, 0.1), 
-         main = "2. Landmark (Infinite Memory)", xlab = "HR", ylab = "RR",
-         xlim = lim_hr, ylim = lim_resp)
-
-    # PLOT 4: Sliding Window (Finite Discrete Memory)
-    # Only the last 'w' points are kept; older data is completely discarded
-    idx_s <- max(1, n_pts - w + 1)
-    plot(history_hr[idx_s:n_pts], history_resp[idx_s:n_pts], pch = 16,
-         col = "blue", main = paste("3. Sliding (w =", w, ")"),
-         xlab = "HR", ylab = "RR", xlim = lim_hr, ylim = lim_resp)
-
-    # PLOT 5: Fading Window (Exponential Decay)
-    # Points fade out smoothly; the weight of history decreases geometrically
-    weights_fading <- alpha_fading^((n_pts:1) - 1)
-    plot(history_hr, history_resp, pch = 16, col = rgb(1, 0.5, 0, alpha = weights_fading), 
-         main = "4. Fading (Exponential Decay)", xlab = "HR", ylab = "RR",
-         xlim = lim_hr, ylim = lim_resp)
-
-    # PLOT 6: Weighted Window (Linear Decay)
-    # Points lose weight linearly until they reach the 'horizon' and disappear
-    weights_linear <- pmax(0, (horizon_linear - (n_pts:1 - 1)) / horizon_linear)
-    plot(history_hr, history_resp, pch = 16, col = rgb(0.5, 0, 0.5, alpha = weights_linear), 
-         main = "5. Weighted (Linear Decay)", xlab = "HR", ylab = "RR",
-         xlim = lim_hr, ylim = lim_resp)
-  }
-  
-  # Global title for the animation across all subplots
-  title("Stream Memory Models Comparison: HR vs RR Correlation", outer = TRUE)
-  
-}, movie.name = "hr_rr_memory_analysis.gif", interval = 0.1)
-```
-
-The visualization contrasts infinite memory (Landmark) against discrete (Sliding) and fading (Fading/Weighted) models, demonstrating the trade-off between historical density and temporal reactivity. The Landmark model preserves the global trajectory at the cost of high memory consumption, whereas the Sliding window provides a computationally efficient but discrete snapshot of the last 100 iterations (in this case). To address the loss of temporal nuance in uniform weighting, the Fading and Weighted models were implemented; the former employs an exponential decay to maintain a smooth historical trace, while the latter uses a linear gradient to phase out the relevance of aging data points, exibiting similar behaviour.
-
-## 2) Use of built-in models from the 'stream' package
-
-### Stream processing (iterative step) - USING BUILT-IN MODELS FROM 'stream' PACKAGE
+## Animation of the evolution of micro-clusters with D-Stream algorithm and fading window model
 
 ```{r}
-# Lambda value for fading models (D-Stream with decay and weighted sliding window)
+# Lambda value for fading models
 
 lambda_value <- -log(eps) / w
-
-# These models implement micro-cluster algorithms internally.
-
-# Landmark-like behaviour (no fading)
-dsc_landmark <- DSC_DStream(
-  gridsize = 1,
-  lambda = 0.001 # Very small lambda to approximate no decay
-)
 
 # Fading model (D-Stream with decay)
 dsc_fading <- DSC_DStream(
   gridsize = 1,
   lambda = lambda_value
 )
-
-# Strict sliding window model
-dsc_sliding <- DSC_Window(
-  horizon = 50
-)
-
-# Weighted sliding window model
-dsc_weighted <- DSC_Window(
-  horizon = 50,
-  lambda = lambda_value
-)
-```
-
-### Animation of the evolution of micro-clusters (D-Stream 4 Models)
-
-```{r}
-###LANDMARK
-
-ani.options(interval = 0.5)
-
-# Reset stream)
-reset_stream(stream_2d)
-
-# Landmark microclusters animation
-saveGIF({
-    animate_cluster(
-    dsc_landmark,             
-    stream_2d, 
-    horizon = 50,          
-    n = 481,               
-    plot.args = list(
-      type = "auto",        
-      grid = TRUE,          
-      xlim = lim_hr,    
-      ylim = lim_resp,      
-      xlab = "Heart Rate (HR)",
-      ylab = "Respiratory Rate (RESP)",
-      main = "D-Stream Landmark Model"
-    )
-  )
-}, 
-movie.name = "micro_clusters_landmark.gif", 
-img.name = "stream_grid_frame_land",   
-clean = TRUE                      
-)
-```
-
-```{r}
-###SLIDING
-
-
-# Reset stream)
-reset_stream(stream_2d)
-
-# Sliding microclusters animation
-saveGIF({
-    animate_cluster(
-    dsc_sliding,             
-    stream_2d, 
-    horizon = 50,          
-    n = 481,               
-    plot.args = list(
-      type = "auto",       
-      grid = TRUE,          
-      xlim = lim_hr,    
-      ylim = lim_resp,      
-      xlab = "Heart Rate (HR)",
-      ylab = "Respiratory Rate (RESP)",
-      main = "D-Stream Sliding Model"
-    )
-  )
-}, 
-movie.name = "micro_clusters_sliding.gif", 
-img.name = "stream_grid_frame_slid",   
-clean = TRUE                      
-)
-```
-
-```{r}
-
-###FADING
 
 # Reset stream)
 reset_stream(stream_2d)
@@ -470,85 +375,6 @@ clean = TRUE
 )
 ```
 
-```{r}
-###WEIGHTED
-
-# Reset stream)
-reset_stream(stream_2d)
-
-# Weighted microclusters animation
-saveGIF({
-    animate_cluster(
-    dsc_weighted,             
-    stream_2d, 
-    horizon = 50,          
-    n = 481,               
-    plot.args = list(
-      type = "auto",        
-      grid = TRUE,          
-      xlim = lim_hr,    
-      ylim = lim_resp,      
-      xlab = "Heart Rate (HR)",
-      ylab = "Respiratory Rate (RESP)",
-      main = "D-Stream Weighted Model"
-    )
-  )
-}, 
-movie.name = "micro_clusters_weighted.gif", 
-img.name = "stream_grid_frame_weight",   
-clean = TRUE                      
-)
-```
-
-### Comparative animation of all 4 models in a 2x2 grid layout
-
-```{r}
-reset_stream(stream_2d)
-
-saveGIF({
-  
-  # animate_cluster() can't show the 4 plots in the same grid 2x2, so we need to do it manually
-  for(i in seq(horizon, n, by = horizon)) {
-    
-    points <- get_points(stream_2d, n = horizon)
-    if(nrow(points) == 0) break
-    
-    # Same points in every graph
-    update(dsc_landmark, points)
-    update(dsc_sliding,  points)
-    update(dsc_fading,   points)
-    update(dsc_weighted, points)
-    
-    # Layout
-    par(mfrow = c(2, 2), mar = c(4, 4, 3, 1), oma = c(0, 0, 3, 0))
-    
-    plot_args_base <- list(
-      type = "auto", 
-      grid = TRUE, 
-      xlim = lim_hr, 
-      ylim = lim_resp,
-      xlab = "HR", 
-      ylab = "RESP",
-      axes = TRUE
-    )
-    
-    # 5. Aplly plots
-  
-    do.call(plot, c(list(dsc_landmark, main = "Landmark"), plot_args_base))
-    do.call(plot, c(list(dsc_sliding,  main = "Sliding"),  plot_args_base))
-    do.call(plot, c(list(dsc_fading,   main = "Fading"),   plot_args_base))
-    do.call(plot, c(list(dsc_weighted, main = "Weighted"), plot_args_base))
-    
-    # Title by frame
-    mtext(paste("Comparison of Stream Models - Observation:", i), 
-          outer = TRUE, cex = 1.2, font = 2)
-  }
-  
-}, 
-movie.name = "combined_micro_clusters_2x2.gif", 
-img.name = "combined_frame", 
-clean = TRUE)
-```
 
 # Close stream connection
 
