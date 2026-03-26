@@ -1,7 +1,7 @@
 ---
 title: "Assignment_2"
 author: "João Silva, Marco Pereira, Mariana Ribeiro"
-date: "2026-03-25"
+date: "2026-03-26"
 output: pdf_document
 ---
 
@@ -16,7 +16,8 @@ The original data was acquired from **critically-ill patients** during hospital 
 
 # Load packages
 
-```{r}
+```{r, echo=FALSE}
+
 # Install packages
 if (!require("tidyverse")) install.packages("tidyverse")
 if (!require("mclust")) install.packages("mclust")
@@ -28,26 +29,21 @@ library(mclust)
 
 # Exercise
 
-Using all the files available in https://physionet.org/content/bidmc/1.0.0/:
+Using all the files available in <https://physionet.org/content/bidmc/1.0.0/>:
 
-1. Create an **object** containing the **mean HR and age** for **each subject**.
-2. **Plot the histogram** of all the **HR means** with the respective **density curve**.
-3. Apply the **expectation-maximization algorithm with 2 and 3 latent classes**.
-4. **Plot the densities** for **each** of the **latent classes**. 
-5. **Plot** the **mean** HR as a **function** of each subject's **age** in which **each point** has a **color** corresponding to the **class to which it belongs**.
-6. **Generate 1000 data points** at random according to a **single distribution fitted to the original data**.
-7. **Generate 1000 data points** at random according to a **mixture of distributions** fitted using **one of the previous EM** computed in 3.
+1.  Create an **object** containing the **mean HR and age** for **each subject**.
+2.  **Plot the histogram** of all the **HR means** with the respective **density curve**.
+3.  Apply the **expectation-maximization algorithm with 2 and 3 latent classes**.
+4.  **Plot the densities** for **each** of the **latent classes**.
+5.  **Plot** the **mean** HR as a **function** of each subject's **age** in which **each point** has a **color** corresponding to the **class to which it belongs**.
+6.  **Generate 1000 data points** at random according to a **single distribution fitted to the original data**.
+7.  **Generate 1000 data points** at random according to a **mixture of distributions** fitted using **one of the previous EM** computed in 3.
 
 The submitted code file should include **comments** to improve readability.
 
-Notes:
-- the filenames vary between bidmc_01 to bidmc_53
-- the **bidmc_XX_Numerics.csv** contains four columns with the physiological parameters, such as the heart rate (**HR**), respiratory rate (RESP), and blood oxygen saturation level (SpO2). These are sampled at 1 Hz.
-- the **bidmc_XX_Fix.txt** contains the values of Fixed variables, such as **age** and gender.
- - the link to download the files are in the following format - "https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download" and "https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Fix.txt"
-- do not also forget to use the **functions density and EM** already **available in R**.
+Notes: - the filenames vary between bidmc_01 to bidmc_53 - the **bidmc_XX_Numerics.csv** contains four columns with the physiological parameters, such as the heart rate (**HR**), respiratory rate (RESP), and blood oxygen saturation level (SpO2). These are sampled at 1 Hz. - the **bidmc_XX_Fix.txt** contains the values of Fixed variables, such as **age** and gender. - the link to download the files are in the following format - "<https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download>" and "<https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Fix.txt>" - do not also forget to use the **functions density and EM** already **available in R**.
 
-# 1. Download data and create an data frame containing the mean HR and age for each subject.
+# 1. Download data and create a data frame containing the mean HR and age for each subject.
 
 ```{r}
 # Create empty data frame to store mean HR and age for each subject
@@ -60,22 +56,28 @@ for (i in 1:53) {
   # Create file links for numerics and fixed data
   numerics_file <- paste0("https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_", sprintf("%02d", i), "_Numerics.csv?download")
   fix_file <- paste0("https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_", sprintf("%02d", i), "_Fix.txt?download")
+  
   # Read the numerics data
   numerics_data <- read.csv(numerics_file)
+  
   # Read the fixed data
   fix_data <- readLines(fix_file, warn = FALSE)
+  
   # Calculate mean HR
   mean_HR <- mean(numerics_data$HR, na.rm = TRUE)
+  
   # Get age from fixed data
   age <- as.integer(sub(".*?([0-9]+).*", "\\1", fix_data[6]))  # Assuming age is in the sixth row
+  
   # Append to the summary data frame
   data_summary <- rbind(data_summary, data.frame(subject = paste0("bidmc_",
-                                                          sprintf("%02d", i)),
-                                                 mean_HR = mean_HR,
-                                                 age = age))
+                                                        sprintf("%02d", i)),
+                                                        mean_HR = mean_HR,
+                                                        age = age))
 }
 ```
-Subject 18 age is missing in the original file.
+
+**Note:** Subject 18 age is missing in the original file!
 
 # 2. Plot the histogram of all the HR means with the respective density curve.
 
@@ -86,7 +88,6 @@ Subject 18 age is missing in the original file.
 hist(data_summary$mean_HR, col = "lightblue",main = "Histogram of Mean HR with Density Curve", xlab = "Mean Heart Rate (HR)", ylab = "Density", freq = FALSE, ylim = c(0, 0.04)) # freq = FALSE to plot density instead of counts
 lines(density(data_summary$mean_HR), col = "red", lwd = 2) # Add density curve
 ```
-
 
 ## Ggplot2
 
@@ -100,7 +101,6 @@ ggplot(data_summary, aes(x = mean_HR)) +
        y = "Density") +
   theme_minimal()
 ```
-
 
 # 3. Apply the expectation-maximization algorithm with 2 and 3 latent classes.
 
@@ -274,8 +274,7 @@ em_2 <- Mclust(data_summary$mean_HR, G = 2, control = emControl(eps=eps, itmax=i
 em_3 <- Mclust(data_summary$mean_HR, G = 3, control = emControl(eps=eps, itmax=itmax))
 ```
 
-
-# 4. Plot the densities for each of the latent classes. 
+# 4. Plot the densities for each of the latent classes.
 
 # 5. Plot the mean HR as a function of each subject's age in which each point has a color corresponding to the class to which it belongs.
 
