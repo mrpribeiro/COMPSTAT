@@ -74,8 +74,17 @@ for (i in 1:53) {
   # Calculate mean HR
   mean_HR <- mean(numerics_data$HR, na.rm = TRUE)
   
-  # Get age from fixed data
-  age <- as.integer(sub(".*?([0-9]+).*", "\\1", fix_data[6]))  # Assuming age is in the sixth row
+  # Age extraction from fixed data: locate the line starting with "Age" dynamically
+  age_line_idx <- grep("^\\s*Age", fix_data, ignore.case = TRUE)
+    
+  if (length(age_line_idx) > 0) {
+    # Extract numeric value safely using regex on the identified line
+    age_str <- sub(".*?([0-9]+).*", "\\1", fix_data[age_line_idx[1]])
+    age <- as.integer(age_str)
+  } else {
+    # Safe fallback if Age is missing from the file
+    age <- NA 
+  }
   
   # Append to the summary data frame
   data_summary <- rbind(data_summary, data.frame(subject = paste0("bidmc_",
@@ -321,6 +330,80 @@ em_3 <- Mclust(data_summary$mean_HR, G = 3, control = emControl(eps=eps, itmax=i
 ```
 
 # 4. Plot the densities for each of the latent classes.
+
+This part will be done based on the results obtained with the Mclust package.
+
+### 2 latent classes (Model: em_2)
+
+```{r}
+# Extract mathematical parameters from the 2-class Mclust model
+means_2 <- em_2$parameters$mean
+sds_2 <- sqrt(em_2$parameters$variance$sigmasq) # Standard deviation
+props_2 <- em_2$parameters$pro                  # Prior probabilities
+
+# Define standardised limits for fair visual comparison across models
+x_min <- min(data_summary$mean_HR, na.rm = TRUE) - 10
+x_max <- max(data_summary$mean_HR, na.rm = TRUE) + 10
+xx <- seq(x_min, x_max, by = 0.1)
+
+colours_2 <- c("red", "darkgreen")
+
+# Plot base histogram with locked axes
+hist(data_summary$mean_HR, col = "lightgray", border = "white",
+     main = "Latent Classes Densities (2 Classes)",
+     xlab = "Mean Heart Rate (bpm)", ylab = "Density", 
+     freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+
+# Overlay the weighted density curve for each latent class
+for (i in 1:2) {
+  lines(xx, props_2[i] * dnorm(xx, mean = means_2[i], sd = sds_2), 
+        col = colours_2[i], lwd = 2)
+}
+
+# Overlay the total mixture density curve (sum of classes)
+total_density_2 <- rowSums(sapply(1:2, function(i) props_2[i] * dnorm(xx, mean = means_2[i], sd = sds_2)))
+lines(xx, total_density_2, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("Class 1", "Class 2", "Total Mixture"), 
+       col = c(colours_2, "black"), lwd = 2, lty = c(1, 1, 2))
+
+```
+
+### 3 latent classes (Model: em_3)
+
+```{r}
+# Extract mathematical parameters from the 3-class Mclust model
+means_3 <- em_3$parameters$mean
+sds_3 <- sqrt(em_3$parameters$variance$sigmasq)
+props_3 <- em_3$parameters$pro
+
+# Maintain identical sequence limits for consistency
+xx <- seq(min(data_summary$mean_HR, na.rm = TRUE) - 10, 
+          max(data_summary$mean_HR, na.rm = TRUE) + 10, by = 0.1)
+
+colours_3 <- c("red", "darkgreen", "purple")
+
+# Plot base histogram with locked axes
+hist(data_summary$mean_HR, col = "lightgray", border = "white",
+     main = "Latent Classes Densities (3 Classes)",
+     xlab = "Mean Heart Rate (bpm)", ylab = "Density", 
+     freq = FALSE, ylim = c(0, 0.08), 
+     xlim = c(min(xx), max(xx)))
+
+# Overlay the weighted density curve for each latent class
+for (i in 1:3) {
+  lines(xx, props_3[i] * dnorm(xx, mean = means_3[i], sd = sds_3), 
+        col = colours_3[i], lwd = 2)
+}
+
+# Overlay the total mixture density curve
+total_density_3 <- rowSums(sapply(1:3, function(i) props_3[i] * dnorm(xx, mean = means_3[i], sd = sds_3)))
+lines(xx, total_density_3, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("Class 1", "Class 2", "Class 3", "Total Mixture"), 
+       col = c(colours_3, "black"), lwd = 2, lty = c(1, 1, 1, 2))
+
+```
 
 # 5. Plot the mean HR as a function of each subject's age in which each point has a color corresponding to the class to which it belongs.
 
