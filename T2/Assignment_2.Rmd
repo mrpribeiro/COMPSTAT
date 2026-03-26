@@ -331,9 +331,9 @@ em_3 <- Mclust(data_summary$mean_HR, G = 3, control = emControl(eps=eps, itmax=i
 
 # 4. Plot the densities for each of the latent classes.
 
-This part will be done based on the results obtained with the Mclust package.
+The next parts will be done based on the results obtained with the Mclust package.
 
-### 2 latent classes (Model: em_2)
+### 2 latent classes (em_2)
 
 ```{r}
 # Extract mathematical parameters from the 2-class Mclust model
@@ -369,7 +369,7 @@ legend("topright", legend = c("Class 1", "Class 2", "Total Mixture"),
 
 ```
 
-### 3 latent classes (Model: em_3)
+### 3 latent classes (em_3)
 
 ```{r}
 # Extract mathematical parameters from the 3-class Mclust model
@@ -406,6 +406,48 @@ legend("topright", legend = c("Class 1", "Class 2", "Class 3", "Total Mixture"),
 ```
 
 # 5. Plot the mean HR as a function of each subject's age in which each point has a color corresponding to the class to which it belongs.
+
+### 2 latent classes (em_2)
+
+```{r}
+# Extract the final crisp classification from the 2-class algorithm
+classes_assigned_2 <- em_2$classification
+colours_2 <- c("red", "darkgreen")
+
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_2[classes_assigned_2], 
+     pch = 16, cex = 1.2,
+     main = "Mean HR vs Age (2 Latent Classes)",
+     xlab = "Age (years)", ylab = "Mean Heart Rate (bpm)",
+     ylim = c(min(data_summary$mean_HR, na.rm = TRUE) - 5, 
+              max(data_summary$mean_HR, na.rm = TRUE) + 5))
+
+# Legend placed inside the top-right corner of the plot window
+legend("topright", legend = paste("Class", 1:2), 
+       col = colours_2, pch = 16, title = "Classification")
+
+```
+
+### 3 latent classes (em_3)
+
+```{r}
+# Extract the final crisp classification from the 3-class algorithm
+classes_assigned_3 <- em_3$classification
+colours_3 <- c("red", "darkgreen", "purple")
+
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[classes_assigned_3], 
+     pch = 16, cex = 1.2,
+     main = "Mean HR vs Age (3 Latent Classes)",
+     xlab = "Age (years)", ylab = "Mean Heart Rate (bpm)",
+     ylim = c(min(data_summary$mean_HR, na.rm = TRUE) - 5, 
+              max(data_summary$mean_HR, na.rm = TRUE) + 5))
+
+# Legend placed inside the top-right corner of the plot window
+legend("topright", legend = paste("Class", 1:3), 
+       col = colours_3, pch = 16, title = "Classification")
+
+```
 
 # 6. Generate 1000 data points at random according to a single distribution fitted to the original data.
 
