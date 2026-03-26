@@ -41,7 +41,15 @@ Using all the files available in <https://physionet.org/content/bidmc/1.0.0/>:
 
 The submitted code file should include **comments** to improve readability.
 
-Notes: - the filenames vary between bidmc_01 to bidmc_53 - the **bidmc_XX_Numerics.csv** contains four columns with the physiological parameters, such as the heart rate (**HR**), respiratory rate (RESP), and blood oxygen saturation level (SpO2). These are sampled at 1 Hz. - the **bidmc_XX_Fix.txt** contains the values of Fixed variables, such as **age** and gender. - the link to download the files are in the following format - "<https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download>" and "<https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Fix.txt>" - do not also forget to use the **functions density and EM** already **available in R**.
+Notes: \
+- the filenames vary between bidmc_01 to bidmc_53 \
+- the **bidmc_XX_Numerics.csv** contains four columns with the physiological parameters, such as the heart rate (**HR**), respiratory rate (RESP), and blood oxygen saturation level (SpO2). These are sampled at 1 Hz. \
+- the **bidmc_XX_Fix.txt** contains the values of Fixed variables, such as **age** and gender. \
+- the link to download the files are in the following format:\
+"<https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download>"\
+and \
+"<https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Fix.txt>"\
+- do not also forget to use the **functions density and EM** already **available in R**.
 
 # 1. Download data and create a data frame containing the mean HR and age for each subject.
 
@@ -81,15 +89,18 @@ for (i in 1:53) {
 
 # 2. Plot the histogram of all the HR means with the respective density curve.
 
-## Base R
+## with [Base R]{.underline}
 
 ```{r}
 # Plot histogram of mean HR with density curve using base R
-hist(data_summary$mean_HR, col = "lightblue",main = "Histogram of Mean HR with Density Curve", xlab = "Mean Heart Rate (HR)", ylab = "Density", freq = FALSE, ylim = c(0, 0.04)) # freq = FALSE to plot density instead of counts
+hist(data_summary$mean_HR, col = "lightblue", 
+     main = "Histogram of Mean HR with Density Curve",
+     xlab = "Mean Heart Rate (HR)", ylab = "Density",
+     freq = FALSE, ylim = c(0, 0.04)) # freq=FALSE to plot density instead of counts
 lines(density(data_summary$mean_HR), col = "red", lwd = 2) # Add density curve
 ```
 
-## Ggplot2
+## with [Ggplot2]{.underline}
 
 ```{r}
 # Plot histogram of mean HR with density curve
@@ -104,7 +115,9 @@ ggplot(data_summary, aes(x = mean_HR)) +
 
 # 3. Apply the expectation-maximization algorithm with 2 and 3 latent classes.
 
-## Manual implementation soft
+## - Manual implementation -
+
+## \> Soft
 
 ### 2 latent classes
 
@@ -126,19 +139,27 @@ for (itera in 0:maxitera) { # EM algorithm loop
 
   ## Expectation-Maximization - E-Step
 
-  xx <- data_summary$mean_HR # data points (mean HR for each subject)
-  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])}) # calculate the density of each data point under each latent class distribution
-  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  # data points (mean HR for each subject)
+  xx <- data_summary$mean_HR 
+  # calculate the density of each data point under each latent class distribution
+  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])})
+  # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) 
 
   ## Expectation-Maximization - M-Step soft
 
-  param.mean.new <- sapply(1:m, function(j){sum(data_summary$mean_HR*relevance[,j])/sum(relevance[,j])}) # update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point
-  param.sd.new <- sapply(1:m, function(j){sqrt(sum(relevance[,j]*(data_summary$mean_HR-param.mean[j])^2)/sum(relevance[,j]))}) # update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point
+  # update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point
+  param.mean.new <- sapply(1:m, function(j){sum(data_summary$mean_HR*relevance[,j])/sum(relevance[,j])})
+  # update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point
+  param.sd.new <- sapply(1:m, function(j){sqrt(sum(relevance[,j]*(data_summary$mean_HR-param.mean[j])^2)/sum(relevance[,j]))})
+
 
   ## Expectation-Maximization - Convergence
 
-  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n") # calculate the difference between the new and old mean parameters to check for convergence
-  if (dif < eps) break # if the difference is less than the convergence threshold, exit the loop
+  # calculate the difference between the new and old mean parameters to check for convergence
+  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n")
+  # if the difference is less than the convergence threshold, exit the loop
+  if (dif < eps) break
   param.mean <- param.mean.new # update the mean parameters for the next iteration
   param.sd <- param.sd.new # update the standard deviation parameters for the next iteration
 }
@@ -164,25 +185,32 @@ for (itera in 0:maxitera) { # EM algorithm loop
 
   ## Expectation-Maximization - E-Step
 
-  xx <- data_summary$mean_HR # data points (mean HR for each subject)
-  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])}) # calculate the density of each data point under each latent class distribution
-  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  # data points (mean HR for each subject)
+  xx <- data_summary$mean_HR
+  # calculate the density of each data point under each latent class distribution
+  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])})
+  # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  relevance <- t(apply(densities, 1, function(l){l/sum(l)}))
 
   ## Expectation-Maximization - M-Step soft
 
-  param.mean.new <- sapply(1:m, function(j){sum(data_summary$mean_HR*relevance[,j])/sum(relevance[,j])}) # update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point
-  param.sd.new <- sapply(1:m, function(j){sqrt(sum(relevance[,j]*(data_summary$mean_HR-param.mean[j])^2)/sum(relevance[,j]))}) # update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point
+  # update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point
+  param.mean.new <- sapply(1:m, function(j){sum(data_summary$mean_HR*relevance[,j])/sum(relevance[,j])})
+  # update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point
+  param.sd.new <- sapply(1:m, function(j){sqrt(sum(relevance[,j]*(data_summary$mean_HR-param.mean[j])^2)/sum(relevance[,j]))})
 
   ## Expectation-Maximization - Convergence
 
-  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n") # calculate the difference between the new and old mean parameters to check for convergence
-  if (dif < eps) break # if the difference is less than the convergence threshold, exit the loop
+  # calculate the difference between the new and old mean parameters to check for convergence
+  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n")
+  # if the difference is less than the convergence threshold, exit the loop
+  if (dif < eps) break
   param.mean <- param.mean.new # update the mean parameters for the next iteration
   param.sd <- param.sd.new # update the standard deviation parameters for the next iteration
 }
 ```
 
-## Manual implementation crisp
+## \>Crisp
 
 ### 2 latent classes
 
@@ -203,21 +231,29 @@ for (itera in 0:maxitera) { # EM algorithm loop
   print(param.sd) # print the current standard deviation parameters for each latent class
 
   ## Expectation-Maximization - E-Step
-
-  xx <- data_summary$mean_HR # data points (mean HR for each subject)
-  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])}) # calculate the density of each data point under each latent class distribution
-  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+ 
+  # data points (mean HR for each subject)
+  xx <- data_summary$mean_HR
+  # calculate the density of each data point under each latent class distribution
+  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])})
+  # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities 
+  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) 
 
   ## Expectation-Maximization - M-Step crisp
 
-  attrib <- t(apply(relevance, 1, function(l){replace(rep(0,m), which.max(l)[1], 1)})) # assign each data point to the latent class with the highest relevance (crisp assignment)
-  param.mean.new <- sapply(1:m, function(j){mean(data_summary$mean_HR[attrib[,j]==1])}) # update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class
-  param.sd.new <- sapply(1:m, function(j){sd(data_summary$mean_HR[attrib[,j]==1])}) # update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class
+  # assign each data point to the latent class with the highest relevance (crisp assignment)
+  attrib <- t(apply(relevance, 1, function(l){replace(rep(0,m), which.max(l)[1], 1)}))
+  # update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class
+  param.mean.new <- sapply(1:m, function(j){mean(data_summary$mean_HR[attrib[,j]==1])})
+  # update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class
+  param.sd.new <- sapply(1:m, function(j){sd(data_summary$mean_HR[attrib[,j]==1])}) 
 
   ## Expectation-Maximization - Convergence
 
-  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n") # calculate the difference between the new and old mean parameters to check for convergence
-  if (dif < eps) break # if the difference is less than the convergence threshold, exit the loop
+  # calculate the difference between the new and old mean parameters to check for convergence
+  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n")
+  # if the difference is less than the convergence threshold, exit the loop 
+  if (dif < eps) break 
   param.mean <- param.mean.new # update the mean parameters for the next iteration
   param.sd <- param.sd.new # update the standard deviation parameters for the next iteration
 }
@@ -243,26 +279,36 @@ for (itera in 0:maxitera) { # EM algorithm loop
 
   ## Expectation-Maximization - E-Step
 
-  xx <- data_summary$mean_HR # data points (mean HR for each subject)
-  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])}) # calculate the density of each data point under each latent class distribution
-  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  # data points (mean HR for each subject)
+  xx <- data_summary$mean_HR
+  # calculate the density of each data point under each latent class distribution
+  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])})
+  # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities 
+  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) 
 
   ## Expectation-Maximization - M-Step crisp
 
-  attrib <- t(apply(relevance, 1, function(l){replace(rep(0,m), which.max(l)[1], 1)})) # assign each data point to the latent class with the highest relevance (crisp assignment)
-  param.mean.new <- sapply(1:m, function(j){mean(data_summary$mean_HR[attrib[,j]==1])}) # update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class
-  param.sd.new <- sapply(1:m, function(j){sd(data_summary$mean_HR[attrib[,j]==1])}) # update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class
+  # assign each data point to the latent class with the highest relevance (crisp assignment)
+  attrib <- t(apply(relevance, 1, function(l){replace(rep(0,m), which.max(l)[1], 1)}))
+  # update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class
+  param.mean.new <- sapply(1:m, function(j){mean(data_summary$mean_HR[attrib[,j]==1])})
+  # update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class 
+  param.sd.new <- sapply(1:m, function(j){sd(data_summary$mean_HR[attrib[,j]==1])}) 
 
   ## Expectation-Maximization - Convergence
 
-  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n") # calculate the difference between the new and old mean parameters to check for convergence
-  if (dif < eps) break # if the difference is less than the convergence threshold, exit the loop
+  # calculate the difference between the new and old mean parameters to check for convergence
+  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n")
+  # if the difference is less than the convergence threshold, exit the loop
+  if (dif < eps) break 
   param.mean <- param.mean.new # update the mean parameters for the next iteration
   param.sd <- param.sd.new # update the standard deviation parameters for the next iteration
 }
 ```
 
-## Using Mclust package to fit Gaussian mixture models with 2 and 3 latent classes. The `Mclust` function will automatically select the best model based on Bayesian Information Criterion, but we will specify the number of classes (G) to fit the models accordingly. We also set convergence criteria for the EM algorithm to ensure it runs efficiently.
+## - Mclust package- 
+
+Using Mclust package to fit Gaussian mixture models with 2 and 3 latent classes. The `Mclust` function will automatically select the best model based on Bayesian Information Criterion, but we will specify the number of classes (G) to fit the models accordingly. We also set convergence criteria for the EM algorithm to ensure it runs efficiently.
 
 ```{r}
 # Set convergence error and maximum number of iterations for EM algorithm
