@@ -1,10 +1,8 @@
 ---
-
 title: "Assignment_2"
 author: "João Silva, Marco Pereira, Mariana Ribeiro"
-date: "2026-03-26"
+date: "2026-03-27"
 output: pdf_document
-
 ---
 
 # Dataset description
@@ -43,7 +41,7 @@ Using all the files available in <https://physionet.org/content/bidmc/1.0.0/>:
 
 The submitted code file should include **comments** to improve readability.
 
-[[Notes:\\\\](Notes:){.uri}](%5BNotes:\%5D(Notes:)%7B.uri%7D){.uri} - the filenames vary between bidmc_01 to bidmc_53\
+[[Notes:\\\\](Notes:){.uri}](%5BNotes:%5D(Notes:)%7B.uri%7D){.uri} - the filenames vary between bidmc_01 to bidmc_53\
 - the **bidmc_XX_Numerics.csv** contains four columns with the physiological parameters, such as the heart rate (**HR**), respiratory rate (RESP), and blood oxygen saturation level (SpO2). These are sampled at 1 Hz.\
 - the **bidmc_XX_Fix.txt** contains the values of Fixed variables, such as **age** and gender.\
 - the link to download the files are in the following format:\
@@ -234,7 +232,7 @@ manual_soft_classes_3 <- apply(relevance, 1, which.max)
 manual_soft_props_3 <- as.numeric(prop.table(table(manual_soft_classes_3)))
 ```
 
-## \>Crisp
+## \> Crisp
 
 ### 2 latent classes
 
@@ -701,7 +699,7 @@ layout(1)
 par(mar = c(5, 4, 4, 2) + 0.1)
 ```
 
-### 3 latent classes (em_3)
+### 3 latent classes
 
 #### Soft (manual)
 
