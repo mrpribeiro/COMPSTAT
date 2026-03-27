@@ -1,8 +1,10 @@
 ---
+
 title: "Assignment_2"
 author: "João Silva, Marco Pereira, Mariana Ribeiro"
 date: "2026-03-26"
 output: pdf_document
+
 ---
 
 # Dataset description
@@ -447,19 +449,19 @@ layout(layout_matrix, widths = c(1, 1, 1, 0.6))
 # Set margins for the main histogram plots
 par(mar = c(4, 4, 3, 1))
 
-# --- Plot 1: Soft Manual (m=2) ---
+#  Plot 1: Soft Manual (m=2) 
 hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Soft Manual (m=2)", xlab = "Mean HR", ylab = "Density", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
 for (i in 1:2) lines(xx, manual_soft_props_2[i] * dnorm(xx, mean = manual_soft_mean_2[i], sd = manual_soft_sd_2[i]), col = colours_2[i], lwd = 2)
 
-# --- Plot 2: Crisp Manual (m=2) ---
+#  Plot 2: Crisp Manual (m=2) 
 hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Crisp Manual (m=2)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
 for (i in 1:2) lines(xx, manual_crisp_props_2[i] * dnorm(xx, mean = manual_crisp_mean_2[i], sd = manual_crisp_sd_2[i]), col = colours_2[i], lwd = 2)
 
-# --- Plot 3: Mclust (m=2) ---
+#  Plot 3: Mclust (m=2) 
 hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Mclust Package (m=2)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
 for (i in 1:2) lines(xx, mclust_props_2[i] * dnorm(xx, mean = mclust_means_2[i], sd = mclust_sds_2), col = colours_2[i], lwd = 2)
 
-# --- Plot 4: LEGEND PANEL ---
+#  Plot 4: LEGEND PANEL 
 par(mar = c(0, 0, 0, 0)) # Remove all margins so the legend centres perfectly
 plot(1, type = "n", axes = FALSE, xlab = "", ylab = "") # Draw an invisible canvas
 legend("center", legend = paste("Class", 1:2), col = colours_2, lwd = 3, cex = 1.2, title = "Latent Classes", bty = "n")
@@ -548,19 +550,19 @@ layout(layout_matrix, widths = c(1, 1, 1, 0.6))
 # Set margins for the main histogram plots
 par(mar = c(4, 4, 3, 1))
 
-# --- Plot 1: Soft Manual ---
+#  Plot 1: Soft Manual 
 hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Soft Manual (m=3)", xlab = "Mean HR", ylab = "Density", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
 for (i in 1:3) lines(xx, manual_soft_props_3[i] * dnorm(xx, mean = manual_soft_mean_3[i], sd = manual_soft_sd_3[i]), col = colours_3[i], lwd = 2)
 
-# --- Plot 2: Crisp Manual ---
+#  Plot 2: Crisp Manual 
 hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Crisp Manual (m=3)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
 for (i in 1:3) lines(xx, manual_crisp_props_3[i] * dnorm(xx, mean = manual_crisp_mean_3[i], sd = manual_crisp_sd_3[i]), col = colours_3[i], lwd = 2)
 
-# --- Plot 3: Mclust ---
+#  Plot 3: Mclust 
 hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Mclust Package (m=3)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
 for (i in 1:3) lines(xx, mclust_props_3[i] * dnorm(xx, mean = mclust_means_3[i], sd = mclust_sds_3), col = colours_3[i], lwd = 2)
 
-# --- Plot 4: LEGEND PANEL ---
+#  Plot 4: LEGEND PANEL 
 par(mar = c(0, 0, 0, 0)) # Remove all margins so the legend centres perfectly
 plot(1, type = "n", axes = FALSE, xlab = "", ylab = "") # Draw an invisible canvas
 legend("center", legend = paste("Class", 1:3), col = colours_3, lwd = 3, cex = 1.2, title = "Latent Classes", bty = "n")
@@ -588,7 +590,7 @@ layout(layout_matrix, widths = c(1, 1, 1, 0.6))
 # Set margins for the main histogram plots
 par(mar = c(4, 4, 3, 1))
 
-# --- ROW 1: 2 CLASSES ---
+#  ROW 1: 2 CLASSES 
 hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Soft Manual (m=2)", xlab = "Mean HR", ylab = "Density", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
 for (i in 1:2) lines(xx, manual_soft_props_2[i] * dnorm(xx, mean = manual_soft_mean_2[i], sd = manual_soft_sd_2[i]), col = colours_2[i], lwd = 2)
 
@@ -599,7 +601,7 @@ hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Mclust P
 for (i in 1:2) lines(xx, mclust_props_2[i] * dnorm(xx, mean = mclust_means_2[i], sd = mclust_sds_2), col = colours_2[i], lwd = 2)
 
 
-# --- ROW 2: 3 CLASSES ---
+#  ROW 2: 3 CLASSES 
 hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Soft Manual (m=3)", xlab = "Mean HR", ylab = "Density", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
 for (i in 1:3) lines(xx, manual_soft_props_3[i] * dnorm(xx, mean = manual_soft_mean_3[i], sd = manual_soft_sd_3[i]), col = colours_3[i], lwd = 2)
 
@@ -610,7 +612,7 @@ hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Mclust P
 for (i in 1:3) lines(xx, mclust_props_3[i] * dnorm(xx, mean = mclust_means_3[i], sd = mclust_sds_3), col = colours_3[i], lwd = 2)
 
 
-# --- LEGEND PANEL (Plot 7) ---
+#  LEGEND PANEL (Plot 7) 
 # Remove all margins so the legend is centred perfectly in its dedicated space
 par(mar = c(0, 0, 0, 0))
 
@@ -628,37 +630,75 @@ par(mar = c(5, 4, 4, 2) + 0.1)
 # 5. Plot the mean HR as a function of each subject's age in which each point has a color corresponding to the class to which it belongs
 
 ```{r}
-
+# Setup parameters
+# Lock Y-axis limits for fair visual comparison across all scatter plots
+y_limits <- c(min(data_summary$mean_HR, na.rm = TRUE) - 5, 
+              max(data_summary$mean_HR, na.rm = TRUE) + 5)
 ```
 
 ### 2 latent classes
 
-```{r}
-
-```
-
 #### Soft (manual)
 
 ```{r}
-
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_2[manual_soft_classes_2], pch = 16, cex = 1.2,
+     main = "Soft Manual (2 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:2), col = colours_2, pch = 16, title = "Classification")
 ```
 
 #### Crisp (manual)
 
 ```{r}
-
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_2[manual_crisp_classes_2], pch = 16, cex = 1.2,
+     main = "Crisp Manual (2 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:2), col = colours_2, pch = 16, title = "Classification")
 ```
 
 #### Mclust
 
 ```{r}
-
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_2[mclust_em_2$classification], pch = 16, cex = 1.2,
+     main = "Mclust Package (2 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:2), col = colours_2, pch = 16, title = "Classification")
 ```
 
 #### 2LM Comparision
 
 ```{r}
+# Set up a Layout Matrix (3 rows x 2 columns)
+# The first column contains plots 1, 2, and 3 stacked vertically.
+# The second column merges to contain plot 4 (the legend) across all rows.
+layout_matrix <- matrix(c(1, 4,
+                          2, 4,
+                          3, 4), nrow = 3, byrow = TRUE)
 
+# Apply the layout. The plot column gets full width (1), the legend column is narrower (0.3)
+layout(layout_matrix, widths = c(1, 0.3))
+par(mar = c(4, 4, 3, 1))
+
+# Plot 1: Soft Manual (m=2) 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[manual_soft_classes_2], pch = 16, cex = 1.2, main = "Soft Manual (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+# Plot 2: Crisp Manual (m=2) 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[manual_crisp_classes_2], pch = 16, cex = 1.2, main = "Crisp Manual (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+# Plot 3: Mclust (m=2) 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[mclust_em_2$classification], pch = 16, cex = 1.2, main = "Mclust Package (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+# Plot 4: LEGEND PANEL 
+par(mar = c(0, 0, 0, 0)) 
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "") 
+legend("center", legend = paste("Class", 1:2), col = colours_2, pch = 16, cex = 1.5, title = "Latent Classes", bty = "n")
+
+# Restore the original graphical parameters
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
 ```
 
 ### 3 latent classes (em_3)
@@ -666,32 +706,134 @@ par(mar = c(5, 4, 4, 2) + 0.1)
 #### Soft (manual)
 
 ```{r}
-
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[manual_soft_classes_3], pch = 16, cex = 1.2,
+     main = "Soft Manual (3 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:3), col = colours_3, pch = 16, title = "Classification")
 ```
 
 #### Crisp (manual)
 
 ```{r}
-
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[manual_crisp_classes_3], pch = 16, cex = 1.2,
+     main = "Crisp Manual (3 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:3), col = colours_3, pch = 16, title = "Classification")
 ```
 
 #### Mclust
 
 ```{r}
-
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[mclust_em_3$classification], pch = 16, cex = 1.2,
+     main = "Mclust Package (3 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:3), col = colours_3, pch = 16, title = "Classification")
 ```
 
 #### 3LM Comparision
 
 ```{r}
+# Set up a Layout Matrix (3 rows x 2 columns)
+# The first column contains the three plots (1, 2, 3)
+# The second column contains the legend (4) spanning all three rows
+layout_matrix_3 <- matrix(c(1, 4,
+                            2, 4,
+                            3, 4), nrow = 3, byrow = TRUE)
 
+# Apply layout: Main plots get width 1, legend column gets 0.3
+layout(layout_matrix_3, widths = c(1, 0.3))
+par(mar = c(4, 4, 3, 1))
 
+# Plot 1: Soft Manual (m=3) 
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[manual_soft_classes_3], 
+     pch = 16, cex = 1.2, 
+     main = "Soft Manual (m=3)", 
+     xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+
+# Plot 2: Crisp Manual (m=3) 
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[manual_crisp_classes_3], 
+     pch = 16, cex = 1.2, 
+     main = "Crisp Manual (m=3)", 
+     xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+
+# Plot 3: Mclust Package (m=3) 
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[mclust_em_3$classification], 
+     pch = 16, cex = 1.2, 
+     main = "Mclust Package (m=3)", 
+     xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+
+# Plot 4: LEGEND PANEL 
+# Remove margins for the dedicated legend column
+par(mar = c(0, 0, 0, 0)) 
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "") 
+
+# Centre the legend vertically relative to the three plots
+legend("center", legend = paste("Class", 1:3), 
+       col = colours_3, pch = 16, cex = 1.5, 
+       title = "Latent Classes", bty = "n")
+
+# Reset layout and margins for the rest of the document
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
 ```
 
 ### Global Comparision
 
 ```{r}
+# Global Comparison Scatter Plots - Vertical Matrix Layout
+# Create a 3x3 layout matrix:
+# Col 1: m=2 models | Col 2: m=3 models | Col 3: Shared Legend
+layout_matrix_global <- matrix(c(1, 2, 7,
+                                 3, 4, 7,
+                                 5, 6, 7), nrow = 3, byrow = TRUE)
 
+# Apply layout: Plots get equal width (1), legend column is narrower (0.4)
+layout(layout_matrix_global, widths = c(1, 1, 0.4))
+par(mar = c(4, 4, 3, 1))
+
+# ROW 1: SOFT MANUAL 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[manual_soft_classes_2], 
+     pch = 16, cex = 1.2, main = "Soft Manual (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+plot(data_summary$age, data_summary$mean_HR, col = colours_3[manual_soft_classes_3], 
+     pch = 16, cex = 1.2, main = "Soft Manual (m=3)", xlab = "Age", ylab = "", ylim = y_limits)
+
+
+# ROW 2: CRISP MANUAL 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[manual_crisp_classes_2], 
+     pch = 16, cex = 1.2, main = "Crisp Manual (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+plot(data_summary$age, data_summary$mean_HR, col = colours_3[manual_crisp_classes_3], 
+     pch = 16, cex = 1.2, main = "Crisp Manual (m=3)", xlab = "Age", ylab = "", ylim = y_limits)
+
+
+# ROW 3: MCLUST PACKAGE 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[mclust_em_2$classification], 
+     pch = 16, cex = 1.2, main = "Mclust Package (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+plot(data_summary$age, data_summary$mean_HR, col = colours_3[mclust_em_3$classification], 
+     pch = 16, cex = 1.2, main = "Mclust Package (m=3)", xlab = "Age", ylab = "", ylim = y_limits)
+
+
+# SHARED LEGEND PANEL (Plot 7) 
+par(mar = c(0, 0, 0, 0))
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")
+# Centred legend explaining the 3-class colour scheme used across the matrix
+legend("center", legend = paste("Class", 1:3), col = colours_3, 
+       pch = 16, cex = 1.5, title = "Latent Classes", bty = "n")
+
+# Restore original settings
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
 ```
 
 # 6. Generate 1000 data points at random according to a single distribution fitted to the original data.
