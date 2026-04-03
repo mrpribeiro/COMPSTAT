@@ -836,4 +836,34 @@ par(mar = c(5, 4, 4, 2) + 0.1)
 
 # 6. Generate 1000 data points at random according to a single distribution fitted to the original data.
 
+```{r}
+## Random Sample Generation
+
+n <- 1000
+set.seed(523)
+sample.simple <- rnorm(n, mean=mean(data_summary$mean_HR), sd=sd(data_summary$mean_HR))
+
+
+par(mfrow=c(1,2))
+hist(data_summary$mean_HR, main="Observed data", xlab="Mean Heart Rate", freq=F, breaks=10, col="lightgray", xlim = c(40,140), ylim = c(0, 0.05))
+lines(density(data_summary$mean_HR), col=2, lwd=2)
+hist(sample.simple,  main="1000 Generated data points from a single distribution", xlab="Mean Heart Rate", freq=F, breaks=10, col="lightgray",xlim = c(40,140), ylim = c(0, 0.05))
+lines(density(sample.simple), col="darkblue", lwd=3)
+
+```
+
 # 7. Generate 1000 data points at random according to a mixture of distributions fitted using one of the previous EM computed in 3.
+
+
+```{r}
+n <- 1000
+set.seed(523)
+sample.EM <- rnorm(n, mean=manual_crisp_mean_3, sd=manual_crisp_sd_3)
+
+par(mfrow=c(1,2))
+hist(data_summary$mean_HR, main="Observed data", xlab="Mean Heart Rate", freq=F, breaks=10, col="lightgray", xlim = c(40,140), ylim = c(0, 0.05))
+lines(density(data_summary$mean_HR), col=2, lwd=2)
+#Manual Crisp 3 classes was chosen for the EM sample generation as it had the best visual fit to the observed data in the previous plots
+hist(sample.EM,  main=paste("1000 EM generated data points (m = 2)"), xlab="Mean Heart Rate", freq=F, breaks=10, col="lightgray",xlim = c(40,140), ylim = c(0, 0.05))
+lines(density(sample.EM), col="darkblue", lwd=2)
+```
