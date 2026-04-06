@@ -822,18 +822,33 @@ par(mar = c(5, 4, 4, 2) + 0.1)
 # 6. Generate 1000 data points at random according to a single distribution fitted to the original data.
 
 ```{r}
-## Random Sample Generation
-
 n <- 1000
 set.seed(523)
-sample.simple <- rnorm(n, mean=mean(data_summary$mean_HR), sd=sd(data_summary$mean_HR))
 
+# Generate points assuming the entire dataset follows one single Normal distribution
+sample.simple <- rnorm(n, 
+                       mean=mean(data_summary$mean_HR), 
+                       sd=sd(data_summary$mean_HR))
 
-par(mfrow=c(1,2), mar=c(5, 6, 5, 6))
-hist(data_summary$mean_HR, main="Observed data", xlab="Mean Heart Rate", freq=F, breaks = 7, col="lightgray", xlim = c(40,140), ylim = c(0, 0.05))
+# Dynamically lock the X-axis limits for a fair visual comparison
+x_limits <- c(min(data_summary$mean_HR, sample_simple) - 10, 
+              max(data_summary$mean_HR, sample_simple) + 10)
+
+# Set up a 1x2 side-by-side graphical layout
+par(mfrow = c(1, 2), mar = c(5, 4, 4, 2) + 0.1)
+
+# Plot 1: Observed real data
+hist(data_summary$mean_HR, main="Observed Data", xlab="Mean HR", 
+     freq=F, breaks = 7, col="lightgray", xlim = x_limits, ylim = c(0, 0.05))
 lines(density(data_summary$mean_HR), col=2, lwd=2)
-hist(sample.simple,  main="1000 Generated data points from a single distribution", xlab="Mean Heart Rate", freq=F, breaks=7, col="lightgray",xlim = c(40,140), ylim = c(0, 0.05))
+
+# Plot 2: Generated data (single distribution)
+hist(sample.simple,  main="Generated Data\n(single distribution)",
+     xlab="Mean HR", freq=F, breaks=7, col="lightgray",xlim = x_limits,
+     ylim = c(0, 0.05))
 lines(density(sample.simple), col="darkblue", lwd=2)
+
+par(mfrow=c(1,1)) # Reset graphical parameters
 
 ```
 
