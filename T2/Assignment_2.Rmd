@@ -841,8 +841,8 @@ sample.simple <- rnorm(n,
                        sd=sd(data_summary$mean_HR))
 
 # Dynamically lock the X-axis limits for a fair visual comparison
-x_limits <- c(min(data_summary$mean_HR, sample_simple) - 10, 
-              max(data_summary$mean_HR, sample_simple) + 10)
+x_limits <- c(min(data_summary$mean_HR, sample.simple) - 10, 
+              max(data_summary$mean_HR, sample.simple) + 10)
 
 # Set up a 1x2 side-by-side graphical layout
 par(mfrow = c(1, 2), mar = c(5, 4, 4, 2) + 0.1)
@@ -885,8 +885,8 @@ sample.values <- unlist(sapply(1:m, function(j){
 }))
 
 # Dynamically lock the X-axis limits
-x_limits_mix <- c(min(data_summary$mean_HR, sample_mixture) - 10, 
-                  max(data_summary$mean_HR, sample_mixture) + 10)
+x_limits_mix <- c(min(data_summary$mean_HR, sample.values) - 10, 
+                  max(data_summary$mean_HR, sample.values) + 10)
 
 # Set up side-by-side plots for visual comparison
 par(mfrow = c(1, 2), mar = c(5, 4, 4, 2) + 0.1)
