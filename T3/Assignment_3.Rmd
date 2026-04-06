@@ -1,0 +1,64 @@
+---
+title: "Assignment_3"
+author: "João Silva, Marco Pereira, Mariana Ribeiro"
+date: "2026-04-06"
+output: pdf_document
+---
+
+# Work Description
+
+## Simulation Overview
+
+Simulate a population with **100,000 subjects**.
+
+**Population Demographics:**
+
+-   48% are male.
+
+-   45% are 50 years old or older.
+
+-   27% of the males smoke.
+
+-   16% of the females smoke.
+
+    *Note: [Risk factors are considered independent.]{.underline}*
+
+**Risk Estimates:**
+
+For this population, the following cumulative risks are estimated:
+
+-   **5-year risk of disease:** 17.6%
+
+    -   50.3% if a smoker \| 5.4% if a non-smoker
+
+    -   22.1% if ≥50 years old \| 13.2% if \<50 years old
+
+-   **10-year risk of any-cause mortality:** 11.5%
+
+    -   22.9% if ≥50 years old \| 1.0% if \<50 years old
+
+    -   12.3% if male \| 10.6% if female
+
+## Data Structure Requirements
+
+The resulting data frame must contain the following:
+
+-   A column for each risk factor.
+
+-   **Yearly risk of death:** i.e., the transition probability from alive to dead.
+
+-   **Yearly risk of disease:** i.e., the transition probability from healthy to ill.
+
+## Primary Objectives
+
+Based on the simulation, answer the following:
+
+1.  How many of the patients developed the disease after 10 years?
+
+2.  How many of the patients died after 10 years?
+
+# Load packages
+
+```{r, echo=FALSE}
+
+```
