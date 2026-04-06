@@ -855,22 +855,36 @@ par(mfrow=c(1,1)) # Reset graphical parameters
 # 7. Generate 1000 data points at random according to a mixture of distributions fitted using one of the previous EM computed in 3.
 
 ```{r}
-
 n <- 1000
 set.seed(523)
+        
+# Manual Crisp 2 classes was chosen for the EM sample generation as it had the best visual fit to the observed data in the previous plots
 m <- 2
+
+# Assign each of the 1000 points to a class based on the calculated proportions
 sample.classes <- sample(1:m, size=n, replace=T, prob=manual_crisp_props_2)
 sample.prop <- prop.table(table(sample.classes))
-sample.values <- round(unlist(sapply(1:m, function(j){
-  rnorm(n*sample.prop[j], mean=manual_crisp_mean_2[j], sd=manual_crisp_sd_2[j])
-})), 0)
 
-par(mfrow=c(1,2), mar=c(5, 6, 5, 6))
-hist(data_summary$mean_HR, main="Observed data", xlab="Mean Heart Rate", freq=F, breaks = 7, col="lightgray", xlim = c(40,140), ylim = c(0, 0.05))
+# Generate continuous normal data for each class iteratively
+sample.values <- unlist(sapply(1:m, function(j){
+  rnorm(n*sample.prop[j], mean=manual_crisp_mean_2[j], sd=manual_crisp_sd_2[j])
+}))
+
+# Dynamically lock the X-axis limits
+x_limits_mix <- c(min(data_summary$mean_HR, sample_mixture) - 10, 
+                  max(data_summary$mean_HR, sample_mixture) + 10)
+
+# Set up side-by-side plots for visual comparison
+par(mfrow = c(1, 2), mar = c(5, 4, 4, 2) + 0.1)
+
+# Plot 1: Observed Data
+hist(data_summary$mean_HR, main="Observed Data", xlab="Mean HR", 
+     freq=F, breaks = 7, col="lightgray", xlim = x_limits_mix, ylim = c(0, 0.05))
 lines(density(data_summary$mean_HR), col=2, lwd=2)
 
-#Manual Crisp 2 classes was chosen for the EM sample generation as it had the best visual fit to the observed data in the previous plots
-
-hist(sample.values,  main=paste("1000 EM generated data points (m = 2)"), xlab="Mean Heart Rate", freq=F, breaks = 7, col="lightgray",xlim = c(40,140), ylim = c(0, 0.05))
+# Plot 2: Generated mixture distribution
+hist(sample.values,  main=paste("Generated data\n(Mixture m = 2)"), xlab="Mean HR", freq=F, breaks = 7, col="lightgray",xlim = x_limits_mix, ylim = c(0, 0.05))
 lines(density(sample.values), col="darkblue", lwd=2)
+
+par(mfrow=c(1,1)) # Reset graphical parameters
 ```
