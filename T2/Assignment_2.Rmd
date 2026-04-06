@@ -610,6 +610,10 @@ layout(1)
 par(mar = c(5, 4, 4, 2) + 0.1)
 ```
 
+A visual comparison of the density estimates reveals significant differences in how the algorithms handle the underlying structure of the data. For $m=2$, both the Crisp manual implementation and the `mclust` package successfully capture the bimodal nature of the clinical data, separating the patients into distinct lower and higher heart rate groups. Conversely, the Soft manual algorithm struggles, modelling one highly concentrated central class and a broad, flat secondary distribution that acts more like background noise than a distinct physiological cohort.
+
+When expanding to three latent classes ($m=3$), the mathematical limitations of the manual Crisp EM become highly apparent. The algorithm produces an unnaturally sharp, narrow density spike (Class 1). Because the Crisp method relies on rigid, binary assignments ($0$ or $1$) during the Expectation step, it is prone to trapping a small number of similar data points into a cluster with near-zero variance, which lacks biological plausibility. In contrast, `mclust` handles the $m=3$ complexity gracefully, identifying a dominant central group alongside two realistic, wider tails representing unusually low and high heart rates. Overall, the `mclust` package demonstrates the highest stability and yields the most physiologically interpretable density curves
+
 # 5. Plot the mean HR as a function of each subject's age in which each point has a color corresponding to the class to which it belongs
 
 ```{r}
@@ -819,6 +823,12 @@ layout(1)
 par(mar = c(5, 4, 4, 2) + 0.1)
 ```
 
+Mapping the latent class assignments against patient Age and Mean HR reveals the practical decision boundaries established by each EM algorithm. Across all models, the stratification occurs almost exclusively along the Y-axis (Mean HR). The horizontal nature of these class boundaries indicates that Age does not exert a confounding or clustering effect in this specific parameterization. Patients are strictly grouped into physiological heart rate tiers irrespective of their demographic age.
+
+Comparing the algorithms highlights the mechanical differences between probabilistic and deterministic clustering. The manual Crisp EM and the `mclust` package display rigid, highly distinct horizontal decision boundaries. In contrast, the manual Soft EM exhibits slight overlaps in classification near the boundaries, accurately reflecting its probabilistic nature where borderline patients retain fractional memberships.
+
+Furthermore, the transition from $m=2$ to $m=3$ clearly illustrates the subdivision of the clinical cohort. The 2-class models partition the data into 'standard' and 'elevated' heart rates, whereas the 3-class models introduce a distinct uppermost tier (Class 3 / Purple), isolating the subset of patients exhibiting severe tachycardia.
+
 # 6. Generate 1000 data points at random according to a single distribution fitted to the original data.
 
 ```{r}
@@ -852,13 +862,17 @@ par(mfrow=c(1,1)) # Reset graphical parameters
 
 ```
 
+A comparative visual analysis between the empirical clinical data and the synthetic single-distribution sample highlights the severe limitations of modelling this patient cohort with a simple Gaussian curve. The observed data (left) is distinctly non-normal, it exhibits a primary central peak alongside a noticeable secondary shoulder towards the higher heart rate spectrum, indicating physiological heterogeneity within the sample.
+
+Conversely, generating data from a single global mean and standard deviation (right) forces these distinct sub-populations into a single, symmetrical bell curve. This monolithic approach smooths over the critical clinical nuances, effectively masking the presence of patients with elevated heart rates. This stark visual disparity mathematically justifies the necessity of the Gaussian Mixture Models (computed via the EM algorithm) to accurately capture the multi-class complexity of the real-world dataset.
+
 # 7. Generate 1000 data points at random according to a mixture of distributions fitted using one of the previous EM computed in 3.
+
+To generate the synthetic mixture sample, the **Manual Crisp model with 2 latent classes (m=2)** was selected. Visual inspection of the density plots from Section 4 demonstrated that this model provided the most accurate fit to the bimodal structure of the observed heart rate data.
 
 ```{r}
 n <- 1000
 set.seed(523)
-        
-# Manual Crisp 2 classes was chosen for the EM sample generation as it had the best visual fit to the observed data in the previous plots
 m <- 2
 
 # Assign each of the 1000 points to a class based on the calculated proportions
@@ -888,3 +902,13 @@ lines(density(sample.values), col="darkblue", lwd=2)
 
 par(mfrow=c(1,1)) # Reset graphical parameters
 ```
+
+In contrast to the monolithic single-distribution approach, the synthetic data generated from the 2-class mixture model successfully replicates the complex physiological profile of the clinical cohort. By sampling from the proportional, mean, and variance parameters derived via the Expectation-Maximisation algorithm, the generated density curve (right) accurately reconstructs both the dominant central peak and the critical secondary shoulder representing patients with elevated heart rates. This visual alignment validates the 2-class mixture model as a statistically robust framework, proving its capacity to simulate the heterogeneous cardiac states inherent to critical care data.
+
+# Final Comments
+
+This analysis conclusively demonstrates that the heart rate profiles of critically ill patients are intrinsically heterogeneous and cannot be accurately modelled by a simple, single distribution. By applying EM algorithms, we successfully unmasked the hidden sub-populations within the clinical dataset.
+
+Through a comparative evaluation of clustering techniques, distinct methodological strengths and weaknesses emerged. The manual Soft EM algorithm struggled to define clear physiological cohorts, treating secondary patient groups as broad mathematical variance. Conversely, the manual Crisp implementation (for m = 2) and the automated `mclust` package provided mathematically rigorous and clinically plausible partitions, effectively isolating standard heart rates from elevated, tachycardic states. Furthermore, mapping these classifications against patient age confirmed that these boundaries are strictly physiological, not demographic.
+
+Ultimately, validating these parameters through synthetic data generation proved that Gaussian Mixture Models, particularly those derived from rigid assignment or the `mclust` architecture, are highly effective statistical tools for capturing, classifying, and simulating complex, multi-state medical data.
