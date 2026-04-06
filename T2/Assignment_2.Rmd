@@ -1,7 +1,7 @@
 ---
 title: "Assignment_2"
 author: "João Silva, Marco Pereira, Mariana Ribeiro"
-date: "2026-03-27"
+date: "2026-04-06"
 output: pdf_document
 ---
 
@@ -97,8 +97,6 @@ for (i in 1:53) {
 
 # 2. Plot the histogram of all the HR means with the respective density curve.
 
-## with [Base R]{.underline}
-
 ```{r}
 # Plot histogram of mean HR with density curve using base R
 hist(data_summary$mean_HR, col = "lightblue", 
@@ -106,19 +104,6 @@ hist(data_summary$mean_HR, col = "lightblue",
      xlab = "Mean Heart Rate (HR)", ylab = "Density",
      freq = FALSE, ylim = c(0, 0.04)) # freq=FALSE to plot density instead of counts
 lines(density(data_summary$mean_HR), col = "red", lwd = 2) # Add density curve
-```
-
-## with [Ggplot2]{.underline}
-
-```{r}
-# Plot histogram of mean HR with density curve
-ggplot(data_summary, aes(x = mean_HR)) + 
-  geom_histogram(aes(y = after_stat(density)), bins = 10, fill = "lightblue", color = "black") + # After stat(density) to plot density on the y-axis. The bars will represent the density instead of counts.
-  geom_density(color = "red", linewidth = 1) + # Add density curve
-  labs(title = "Histogram of Mean HR with Density Curve",
-       x = "Mean Heart Rate (HR)",
-       y = "Density") +
-  theme_minimal()
 ```
 
 # 3. Apply the expectation-maximization algorithm with 2 and 3 latent classes.
@@ -853,7 +838,6 @@ lines(density(sample.simple), col="darkblue", lwd=2)
 ```
 
 # 7. Generate 1000 data points at random according to a mixture of distributions fitted using one of the previous EM computed in 3.
-
 
 ```{r}
 
