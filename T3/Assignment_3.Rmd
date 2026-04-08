@@ -65,8 +65,98 @@ Based on the simulation, answer the following:
 
 # Block 1: Initial Cohort Generation
 
-# Block 2: Markov Chain Engine and Transition Rates
+The foundation of our model requires generating a baseline population of 100,000 individuals (Time 0). To ensure the strict reproducibility required by Monte Carlo simulations, we begin by defining a fixed seed.
+We generate the independent demographic variables (Gender and Age Group) using simple sampling with replacement, adhering to the marginal probabilities provided in the assignment (48% male; 45% aged 50 or older).
 
-# Block 3: Risk Combination and Results Analysis
+```{r}
+
+# Reprodutibility and sample size
+set.seed(9) 
+N <- 100000
+
+# Generation of Independent Variables
+  # Gender - 48% male, 52% female
+pop_sex <- sample(
+  x = c("Male", "Female"), 
+  size = N, 
+  replace = TRUE, 
+  prob = c(0.48, 0.52)
+)
+  # Age - 45% >=50, 55% <50.
+pop_age <- sample(
+  x = c(">=50", "<50"), 
+  size = N, 
+  replace = TRUE, 
+  prob = c(0.45, 0.55)
+)
+```
+
+Unlike age and gender, smoking status is a conditional variable. We cannot generate it blindly, as the probability of being a smoker is explicitly dependent on gender (27% for men versus 16% for women). To solve this, we allocate an empty vector and apply targeted sampling based on gender indices.
+
+```{r}
+# Generation of the Conditional Variable (Smoking)
+   # 27% of the males smoke.
+   # 16% of the females smoke.
+# Initialise an empty vector
+pop_smoke <- character(N)
+
+# Identify indexes of men and women
+idx_male <- which(pop_sex == "Male")
+idx_female <- which(pop_sex == "Female")
+
+# Simulate smoking ONLY for men (27% smokers)
+pop_smoke[idx_male] <- sample(
+  x = c("Smoker", "Non-Smoker"),
+  size = length(idx_male),
+  replace = TRUE,
+  prob = c(0.27, 0.73)
+)
+
+# Simulate smoking ONLY for women (16% smokers)
+pop_smoke[idx_female] <- sample(
+  x = c("Smoker", "Non-Smoker"),
+  size = length(idx_female),
+  replace = TRUE,
+  prob = c(0.16, 0.84)
+)
+```
+
+We consolidate the generated vectors into a single data frame, immediately converting them to factors. We also pre-allocate empty columns for the annual risks, which will be populated in Block 2.
+
+```{r}
+# Building the data frame
+cohort <- data.frame(
+  ID = 1:N,
+  Gender = factor(pop_sex, levels = c("Male", "Female")),
+  AgeGroup = factor(pop_age, levels = c("<50", ">=50")),
+  SmokingStatus = factor(pop_smoke, levels = c("Non-Smoker", "Smoker"))
+)
+
+# Added already required blank columns to be filled later
+cohort$YearlyRisk_Disease <- NA
+cohort$YearlyRisk_Death <- NA
+
+# View dataframe
+cohort
+```
+
+In large-scale stochastic simulations, we must empirically verify our generated data against our theoretical assumptions. The tables below confirm that our Monte Carlo generation successfully converges on the target proportions required by the assignment.
+
+```{r}
+# Validation (Quality Check)
+print("--- Validation: Gender Distribution ---")
+round(prop.table(table(cohort$Gender)) * 100, 2)
+
+print("--- Validation: Age Distribution ---")
+round(prop.table(table(cohort$AgeGroup)) * 100, 2)
+
+print("--- Validation: Smoking by Gender ---")
+round(prop.table(table(cohort$Gender, cohort$SmokingStatus), margin = 1) * 100, 2)
+
+```
+
+# Block 2: Risk Combination and Conversion to Annual Rates
+
+# Block 3: Markov Chain and Results Analysis
 
 # Conclusions
