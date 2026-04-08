@@ -1,7 +1,7 @@
 ---
 title: "Assignment_3"
 author: "João Silva, Marco Pereira, Mariana Ribeiro"
-date: "2026-04-06"
+date: "2026-04-08"
 output: pdf_document
 ---
 
@@ -57,8 +57,16 @@ Based on the simulation, answer the following:
 
 2.  How many of the patients died after 10 years?
 
-# Load packages
+## Load packages
 
 ```{r, echo=FALSE}
 
 ```
+
+# Block 1: Initial Cohort Generation
+
+# Block 2: Markov Chain Engine and Transition Rates
+
+# Block 3: Risk Combination and Results Analysis
+
+# Conclusions
