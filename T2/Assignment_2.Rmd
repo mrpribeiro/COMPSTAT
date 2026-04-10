@@ -1,7 +1,7 @@
 ---
 title: "Assignment_2"
 author: "João Silva, Marco Pereira, Mariana Ribeiro"
-date: "2026-03-25"
+date: "2026-04-06"
 output: pdf_document
 ---
 
@@ -16,7 +16,8 @@ The original data was acquired from **critically-ill patients** during hospital 
 
 # Load packages
 
-```{r}
+```{r, echo=FALSE}
+
 # Install packages
 if (!require("tidyverse")) install.packages("tidyverse")
 if (!require("mclust")) install.packages("mclust")
@@ -28,26 +29,28 @@ library(mclust)
 
 # Exercise
 
-Using all the files available in https://physionet.org/content/bidmc/1.0.0/:
+Using all the files available in <https://physionet.org/content/bidmc/1.0.0/>:
 
-1. Create an **object** containing the **mean HR and age** for **each subject**.
-2. **Plot the histogram** of all the **HR means** with the respective **density curve**.
-3. Apply the **expectation-maximization algorithm with 2 and 3 latent classes**.
-4. **Plot the densities** for **each** of the **latent classes**. 
-5. **Plot** the **mean** HR as a **function** of each subject's **age** in which **each point** has a **color** corresponding to the **class to which it belongs**.
-6. **Generate 1000 data points** at random according to a **single distribution fitted to the original data**.
-7. **Generate 1000 data points** at random according to a **mixture of distributions** fitted using **one of the previous EM** computed in 3.
+1.  Create an **object** containing the **mean HR and age** for **each subject**.
+2.  **Plot the histogram** of all the **HR means** with the respective **density curve**.
+3.  Apply the **expectation-maximization algorithm with 2 and 3 latent classes**.
+4.  **Plot the densities** for **each** of the **latent classes**.
+5.  **Plot** the **mean** HR as a **function** of each subject's **age** in which **each point** has a **color** corresponding to the **class to which it belongs**.
+6.  **Generate 1000 data points** at random according to a **single distribution fitted to the original data**.
+7.  **Generate 1000 data points** at random according to a **mixture of distributions** fitted using **one of the previous EM** computed in 3.
 
 The submitted code file should include **comments** to improve readability.
 
-Notes:
-- the filenames vary between bidmc_01 to bidmc_53
-- the **bidmc_XX_Numerics.csv** contains four columns with the physiological parameters, such as the heart rate (**HR**), respiratory rate (RESP), and blood oxygen saturation level (SpO2). These are sampled at 1 Hz.
-- the **bidmc_XX_Fix.txt** contains the values of Fixed variables, such as **age** and gender.
- - the link to download the files are in the following format - "https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download" and "https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Fix.txt"
+[[Notes:\\\\](Notes:){.uri}](%5BNotes:%5D(Notes:)%7B.uri%7D){.uri} - the filenames vary between bidmc_01 to bidmc_53\
+- the **bidmc_XX_Numerics.csv** contains four columns with the physiological parameters, such as the heart rate (**HR**), respiratory rate (RESP), and blood oxygen saturation level (SpO2). These are sampled at 1 Hz.\
+- the **bidmc_XX_Fix.txt** contains the values of Fixed variables, such as **age** and gender.\
+- the link to download the files are in the following format:\
+"<https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download>"\
+and\
+"<https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Fix.txt>"\
 - do not also forget to use the **functions density and EM** already **available in R**.
 
-# 1. Download data and create an data frame containing the mean HR and age for each subject.
+# 1. Download data and create a data frame containing the mean HR and age for each subject.
 
 ```{r}
 # Create empty data frame to store mean HR and age for each subject
@@ -60,51 +63,54 @@ for (i in 1:53) {
   # Create file links for numerics and fixed data
   numerics_file <- paste0("https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_", sprintf("%02d", i), "_Numerics.csv?download")
   fix_file <- paste0("https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_", sprintf("%02d", i), "_Fix.txt?download")
+  
   # Read the numerics data
   numerics_data <- read.csv(numerics_file)
+  
   # Read the fixed data
   fix_data <- readLines(fix_file, warn = FALSE)
+  
   # Calculate mean HR
   mean_HR <- mean(numerics_data$HR, na.rm = TRUE)
-  # Get age from fixed data
-  age <- as.integer(sub(".*?([0-9]+).*", "\\1", fix_data[6]))  # Assuming age is in the sixth row
+  
+  # Age extraction from fixed data: locate the line starting with "Age" dynamically
+  age_line_idx <- grep("^\\s*Age", fix_data, ignore.case = TRUE)
+    
+  if (length(age_line_idx) > 0) {
+    # Extract numeric value safely using regex on the identified line
+    age_str <- sub(".*?([0-9]+).*", "\\1", fix_data[age_line_idx[1]])
+    age <- as.integer(age_str)
+  } else {
+    # Safe fallback if Age is missing from the file
+    age <- NA 
+  }
+  
   # Append to the summary data frame
   data_summary <- rbind(data_summary, data.frame(subject = paste0("bidmc_",
-                                                          sprintf("%02d", i)),
-                                                 mean_HR = mean_HR,
-                                                 age = age))
+                                                        sprintf("%02d", i)),
+                                                        mean_HR = mean_HR,
+                                                        age = age))
 }
 ```
-Subject 18 age is missing in the original file.
+
+**Note:** Subject 18 age is missing in the original file!
 
 # 2. Plot the histogram of all the HR means with the respective density curve.
 
-## Base R
-
 ```{r}
 # Plot histogram of mean HR with density curve using base R
-hist(data_summary$mean_HR, col = "lightblue",main = "Histogram of Mean HR with Density Curve", xlab = "Mean Heart Rate (HR)", ylab = "Density", freq = FALSE, ylim = c(0, 0.04)) # freq = FALSE to plot density instead of counts
+hist(data_summary$mean_HR, col = "lightblue", 
+     main = "Histogram of Mean HR with Density Curve",
+     xlab = "Mean Heart Rate (HR)", ylab = "Density",
+     freq = FALSE, ylim = c(0, 0.04)) # freq=FALSE to plot density instead of counts
 lines(density(data_summary$mean_HR), col = "red", lwd = 2) # Add density curve
 ```
 
-
-## Ggplot2
-
-```{r}
-# Plot histogram of mean HR with density curve
-ggplot(data_summary, aes(x = mean_HR)) + 
-  geom_histogram(aes(y = after_stat(density)), bins = 10, fill = "lightblue", color = "black") + # After stat(density) to plot density on the y-axis. The bars will represent the density instead of counts.
-  geom_density(color = "red", linewidth = 1) + # Add density curve
-  labs(title = "Histogram of Mean HR with Density Curve",
-       x = "Mean Heart Rate (HR)",
-       y = "Density") +
-  theme_minimal()
-```
-
-
 # 3. Apply the expectation-maximization algorithm with 2 and 3 latent classes.
 
-## Manual implementation soft
+## - Manual implementation -
+
+## \> Soft
 
 ### 2 latent classes
 
@@ -126,22 +132,37 @@ for (itera in 0:maxitera) { # EM algorithm loop
 
   ## Expectation-Maximization - E-Step
 
-  xx <- data_summary$mean_HR # data points (mean HR for each subject)
-  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])}) # calculate the density of each data point under each latent class distribution
-  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  # data points (mean HR for each subject)
+  xx <- data_summary$mean_HR 
+  # calculate the density of each data point under each latent class distribution
+  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])})
+  # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) 
 
   ## Expectation-Maximization - M-Step soft
 
-  param.mean.new <- sapply(1:m, function(j){sum(data_summary$mean_HR*relevance[,j])/sum(relevance[,j])}) # update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point
-  param.sd.new <- sapply(1:m, function(j){sqrt(sum(relevance[,j]*(data_summary$mean_HR-param.mean[j])^2)/sum(relevance[,j]))}) # update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point
+  # update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point
+  param.mean.new <- sapply(1:m, function(j){sum(data_summary$mean_HR*relevance[,j])/sum(relevance[,j])})
+  # update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point
+  param.sd.new <- sapply(1:m, function(j){sqrt(sum(relevance[,j]*(data_summary$mean_HR-param.mean[j])^2)/sum(relevance[,j]))})
+
 
   ## Expectation-Maximization - Convergence
 
-  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n") # calculate the difference between the new and old mean parameters to check for convergence
-  if (dif < eps) break # if the difference is less than the convergence threshold, exit the loop
+  # calculate the difference between the new and old mean parameters to check for convergence
+  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n")
+  # if the difference is less than the convergence threshold, exit the loop
+  if (dif < eps) break
   param.mean <- param.mean.new # update the mean parameters for the next iteration
   param.sd <- param.sd.new # update the standard deviation parameters for the next iteration
 }
+
+# Save manual soft 2-class parameters for plotting in parts 4 and 5
+manual_soft_mean_2 <- param.mean
+manual_soft_sd_2 <- param.sd
+# In soft EM, crisp assignments for plotting are derived from the highest relevance
+manual_soft_classes_2 <- apply(relevance, 1, which.max) 
+manual_soft_props_2 <- as.numeric(prop.table(table(manual_soft_classes_2)))
 ```
 
 ### 3 latent classes
@@ -164,25 +185,39 @@ for (itera in 0:maxitera) { # EM algorithm loop
 
   ## Expectation-Maximization - E-Step
 
-  xx <- data_summary$mean_HR # data points (mean HR for each subject)
-  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])}) # calculate the density of each data point under each latent class distribution
-  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  # data points (mean HR for each subject)
+  xx <- data_summary$mean_HR
+  # calculate the density of each data point under each latent class distribution
+  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])})
+  # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  relevance <- t(apply(densities, 1, function(l){l/sum(l)}))
 
   ## Expectation-Maximization - M-Step soft
 
-  param.mean.new <- sapply(1:m, function(j){sum(data_summary$mean_HR*relevance[,j])/sum(relevance[,j])}) # update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point
-  param.sd.new <- sapply(1:m, function(j){sqrt(sum(relevance[,j]*(data_summary$mean_HR-param.mean[j])^2)/sum(relevance[,j]))}) # update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point
+  # update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point
+  param.mean.new <- sapply(1:m, function(j){sum(data_summary$mean_HR*relevance[,j])/sum(relevance[,j])})
+  # update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point
+  param.sd.new <- sapply(1:m, function(j){sqrt(sum(relevance[,j]*(data_summary$mean_HR-param.mean[j])^2)/sum(relevance[,j]))})
 
   ## Expectation-Maximization - Convergence
 
-  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n") # calculate the difference between the new and old mean parameters to check for convergence
-  if (dif < eps) break # if the difference is less than the convergence threshold, exit the loop
+  # calculate the difference between the new and old mean parameters to check for convergence
+  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n")
+  # if the difference is less than the convergence threshold, exit the loop
+  if (dif < eps) break
   param.mean <- param.mean.new # update the mean parameters for the next iteration
   param.sd <- param.sd.new # update the standard deviation parameters for the next iteration
 }
+
+# Save manual soft 3-class parameters for plotting in parts 4 and 5
+manual_soft_mean_3 <- param.mean
+manual_soft_sd_3 <- param.sd
+# In soft EM, crisp assignments for plotting are derived from the highest relevance
+manual_soft_classes_3 <- apply(relevance, 1, which.max)
+manual_soft_props_3 <- as.numeric(prop.table(table(manual_soft_classes_3)))
 ```
 
-## Manual implementation crisp
+## \> Crisp
 
 ### 2 latent classes
 
@@ -203,24 +238,38 @@ for (itera in 0:maxitera) { # EM algorithm loop
   print(param.sd) # print the current standard deviation parameters for each latent class
 
   ## Expectation-Maximization - E-Step
-
-  xx <- data_summary$mean_HR # data points (mean HR for each subject)
-  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])}) # calculate the density of each data point under each latent class distribution
-  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+ 
+  # data points (mean HR for each subject)
+  xx <- data_summary$mean_HR
+  # calculate the density of each data point under each latent class distribution
+  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])})
+  # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities 
+  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) 
 
   ## Expectation-Maximization - M-Step crisp
 
-  attrib <- t(apply(relevance, 1, function(l){replace(rep(0,m), which.max(l)[1], 1)})) # assign each data point to the latent class with the highest relevance (crisp assignment)
-  param.mean.new <- sapply(1:m, function(j){mean(data_summary$mean_HR[attrib[,j]==1])}) # update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class
-  param.sd.new <- sapply(1:m, function(j){sd(data_summary$mean_HR[attrib[,j]==1])}) # update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class
+  # assign each data point to the latent class with the highest relevance (crisp assignment)
+  attrib <- t(apply(relevance, 1, function(l){replace(rep(0,m), which.max(l)[1], 1)}))
+  # update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class
+  param.mean.new <- sapply(1:m, function(j){mean(data_summary$mean_HR[attrib[,j]==1])})
+  # update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class
+  param.sd.new <- sapply(1:m, function(j){sd(data_summary$mean_HR[attrib[,j]==1])}) 
 
   ## Expectation-Maximization - Convergence
 
-  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n") # calculate the difference between the new and old mean parameters to check for convergence
-  if (dif < eps) break # if the difference is less than the convergence threshold, exit the loop
+  # calculate the difference between the new and old mean parameters to check for convergence
+  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n")
+  # if the difference is less than the convergence threshold, exit the loop 
+  if (dif < eps) break 
   param.mean <- param.mean.new # update the mean parameters for the next iteration
   param.sd <- param.sd.new # update the standard deviation parameters for the next iteration
 }
+
+# Save manual crisp 2-class parameters for plotting in parts 4 and 5
+manual_crisp_mean_2 <- param.mean
+manual_crisp_sd_2 <- param.sd
+manual_crisp_classes_2 <- apply(attrib, 1, which.max)
+manual_crisp_props_2 <- as.numeric(prop.table(table(manual_crisp_classes_2)))
 ```
 
 ### 3 latent classes
@@ -243,42 +292,623 @@ for (itera in 0:maxitera) { # EM algorithm loop
 
   ## Expectation-Maximization - E-Step
 
-  xx <- data_summary$mean_HR # data points (mean HR for each subject)
-  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])}) # calculate the density of each data point under each latent class distribution
-  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities
+  # data points (mean HR for each subject)
+  xx <- data_summary$mean_HR
+  # calculate the density of each data point under each latent class distribution
+  densities <- sapply(1:m, function(i){dnorm(xx,mean=param.mean[i],sd=param.sd[i])})
+  # calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities 
+  relevance <- t(apply(densities, 1, function(l){l/sum(l)})) 
 
   ## Expectation-Maximization - M-Step crisp
 
-  attrib <- t(apply(relevance, 1, function(l){replace(rep(0,m), which.max(l)[1], 1)})) # assign each data point to the latent class with the highest relevance (crisp assignment)
-  param.mean.new <- sapply(1:m, function(j){mean(data_summary$mean_HR[attrib[,j]==1])}) # update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class
-  param.sd.new <- sapply(1:m, function(j){sd(data_summary$mean_HR[attrib[,j]==1])}) # update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class
+  # assign each data point to the latent class with the highest relevance (crisp assignment)
+  attrib <- t(apply(relevance, 1, function(l){replace(rep(0,m), which.max(l)[1], 1)}))
+  # update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class
+  param.mean.new <- sapply(1:m, function(j){mean(data_summary$mean_HR[attrib[,j]==1])})
+  # update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class 
+  param.sd.new <- sapply(1:m, function(j){sd(data_summary$mean_HR[attrib[,j]==1])}) 
 
   ## Expectation-Maximization - Convergence
 
-  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n") # calculate the difference between the new and old mean parameters to check for convergence
-  if (dif < eps) break # if the difference is less than the convergence threshold, exit the loop
+  # calculate the difference between the new and old mean parameters to check for convergence
+  cat("Iteration",itera,"evolution:",dif <- sum(abs(param.mean.new - param.mean)), "\n")
+  # if the difference is less than the convergence threshold, exit the loop
+  if (dif < eps) break 
   param.mean <- param.mean.new # update the mean parameters for the next iteration
   param.sd <- param.sd.new # update the standard deviation parameters for the next iteration
 }
+
+# Save manual crisp 3-class parameters for plotting in parts 4 and 5
+manual_crisp_mean_3 <- param.mean
+manual_crisp_sd_3 <- param.sd
+manual_crisp_classes_3 <- apply(attrib, 1, which.max)
+manual_crisp_props_3 <- as.numeric(prop.table(table(manual_crisp_classes_3)))
 ```
 
-## Using Mclust package to fit Gaussian mixture models with 2 and 3 latent classes. The `Mclust` function will automatically select the best model based on Bayesian Information Criterion, but we will specify the number of classes (G) to fit the models accordingly. We also set convergence criteria for the EM algorithm to ensure it runs efficiently.
+## - Mclust package-
+
+Using Mclust package to fit Gaussian mixture models with 2 and 3 latent classes. The `Mclust` function will automatically select the best model based on Bayesian Information Criterion, but we will specify the number of classes (G) to fit the models accordingly. We also set convergence criteria for the EM algorithm to ensure it runs efficiently.
 
 ```{r}
 # Set convergence error and maximum number of iterations for EM algorithm
 eps <- 0.01
 itmax <- 100
 # Apply EM algorithm with 2 latent classes
-em_2 <- Mclust(data_summary$mean_HR, G = 2, control = emControl(eps=eps, itmax=itmax))
+mclust_em_2 <- Mclust(data_summary$mean_HR, G = 2, control = emControl(eps=eps, itmax=itmax))
 # Apply EM algorithm with 3 latent classes
-em_3 <- Mclust(data_summary$mean_HR, G = 3, control = emControl(eps=eps, itmax=itmax))
+mclust_em_3 <- Mclust(data_summary$mean_HR, G = 3, control = emControl(eps=eps, itmax=itmax))
 ```
 
+# 4. Plot the densities for each of the latent classes.
 
-# 4. Plot the densities for each of the latent classes. 
+```{r}
+# Setup parameters
 
-# 5. Plot the mean HR as a function of each subject's age in which each point has a color corresponding to the class to which it belongs.
+# Define standardised limits and common variables for fair visual comparison across all models
+x_min <- min(data_summary$mean_HR, na.rm = TRUE) - 10
+x_max <- max(data_summary$mean_HR, na.rm = TRUE) + 10
+xx <- seq(x_min, x_max, by = 0.1)
+
+# Define robust colour palettes
+colours_2 <- c("red", "darkgreen")
+colours_3 <- c("red", "darkgreen", "purple")
+```
+
+### 2 latent classes
+
+#### Soft (manual)
+
+```{r}
+hist(data_summary$mean_HR, col = "lightgray", border = "white",
+     main = "Soft Manual (2 Classes)",
+     xlab = "Mean Heart Rate (bpm)", ylab = "Density", 
+     freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+
+for (i in 1:2) {
+  lines(xx, manual_soft_props_2[i] * dnorm(xx, mean = manual_soft_mean_2[i], sd = manual_soft_sd_2[i]), 
+        col = colours_2[i], lwd = 2)
+}
+
+total_density_soft_2 <- rowSums(sapply(1:2, function(i) manual_soft_props_2[i] * dnorm(xx, mean = manual_soft_mean_2[i], sd = manual_soft_sd_2[i])))
+lines(xx, total_density_soft_2, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("Class 1", "Class 2", "Total Mixture"), 
+       col = c(colours_2, "black"), lwd = 2, lty = c(1, 1, 2))
+```
+
+#### Crisp (manual)
+
+```{r}
+hist(data_summary$mean_HR, col = "lightgray", border = "white",
+     main = "Crisp Manual (2 Classes)",
+     xlab = "Mean Heart Rate (bpm)", ylab = "Density", 
+     freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+
+for (i in 1:2) {
+  lines(xx, manual_crisp_props_2[i] * dnorm(xx, mean = manual_crisp_mean_2[i], sd = manual_crisp_sd_2[i]), 
+        col = colours_2[i], lwd = 2)
+}
+
+total_density_crisp_2 <- rowSums(sapply(1:2, function(i) manual_crisp_props_2[i] * dnorm(xx, mean = manual_crisp_mean_2[i], sd = manual_crisp_sd_2[i])))
+lines(xx, total_density_crisp_2, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("Class 1", "Class 2", "Total Mixture"), 
+       col = c(colours_2, "black"), lwd = 2, lty = c(1, 1, 2))
+```
+
+#### Mclust
+
+```{r}
+# Extract mathematical parameters from the Mclust model
+mclust_means_2 <- mclust_em_2$parameters$mean
+mclust_sds_2 <- sqrt(mclust_em_2$parameters$variance$sigmasq) 
+mclust_props_2 <- mclust_em_2$parameters$pro                  
+
+hist(data_summary$mean_HR, col = "lightgray", border = "white",
+     main = "Mclust Package (2 Classes)",
+     xlab = "Mean Heart Rate (bpm)", ylab = "Density", 
+     freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+
+for (i in 1:2) {
+  lines(xx, mclust_props_2[i] * dnorm(xx, mean = mclust_means_2[i], sd = mclust_sds_2), 
+        col = colours_2[i], lwd = 2)
+}
+
+total_density_mclust_2 <- rowSums(sapply(1:2, function(i) mclust_props_2[i] * dnorm(xx, mean = mclust_means_2[i], sd = mclust_sds_2)))
+lines(xx, total_density_mclust_2, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("Class 1", "Class 2", "Total Mixture"), 
+       col = c(colours_2, "black"), lwd = 2, lty = c(1, 1, 2))
+```
+
+#### 2LM Comparision
+
+```{r}
+# Set up a Layout Matrix (1 row x 4 columns)
+# The 4th column is dedicated to the legend and made slightly wider (0.6)
+layout_matrix <- matrix(c(1, 2, 3, 4), nrow = 1)
+layout(layout_matrix, widths = c(1, 1, 1, 0.6))
+
+# Set margins for the main histogram plots
+par(mar = c(4, 4, 3, 1))
+
+#  Plot 1: Soft Manual (m=2) 
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Soft Manual (m=2)", xlab = "Mean HR", ylab = "Density", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:2) lines(xx, manual_soft_props_2[i] * dnorm(xx, mean = manual_soft_mean_2[i], sd = manual_soft_sd_2[i]), col = colours_2[i], lwd = 2)
+
+#  Plot 2: Crisp Manual (m=2) 
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Crisp Manual (m=2)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:2) lines(xx, manual_crisp_props_2[i] * dnorm(xx, mean = manual_crisp_mean_2[i], sd = manual_crisp_sd_2[i]), col = colours_2[i], lwd = 2)
+
+#  Plot 3: Mclust (m=2) 
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Mclust Package (m=2)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:2) lines(xx, mclust_props_2[i] * dnorm(xx, mean = mclust_means_2[i], sd = mclust_sds_2), col = colours_2[i], lwd = 2)
+
+#  Plot 4: LEGEND PANEL 
+par(mar = c(0, 0, 0, 0)) # Remove all margins so the legend centres perfectly
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "") # Draw an invisible canvas
+legend("center", legend = paste("Class", 1:2), col = colours_2, lwd = 3, cex = 1.2, title = "Latent Classes", bty = "n")
+
+# Restore the original graphical layout
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+### 3 latent classes
+
+#### Soft (manual)
+
+```{r}
+hist(data_summary$mean_HR, col = "lightgray", border = "white",
+     main = "Soft Manual (3 Classes)",
+     xlab = "Mean Heart Rate (bpm)", ylab = "Density", 
+     freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+
+for (i in 1:3) {
+  lines(xx, manual_soft_props_3[i] * dnorm(xx, mean = manual_soft_mean_3[i], sd = manual_soft_sd_3[i]), 
+        col = colours_3[i], lwd = 2)
+}
+
+total_density_soft_3 <- rowSums(sapply(1:3, function(i) manual_soft_props_3[i] * dnorm(xx, mean = manual_soft_mean_3[i], sd = manual_soft_sd_3[i])))
+lines(xx, total_density_soft_3, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("Class 1", "Class 2", "Class 3", "Total Mixture"), 
+       col = c(colours_3, "black"), lwd = 2, lty = c(1, 1, 1, 2))
+```
+
+#### Crisp (manual)
+
+```{r}
+hist(data_summary$mean_HR, col = "lightgray", border = "white",
+     main = "Crisp Manual (3 Classes)",
+     xlab = "Mean Heart Rate (bpm)", ylab = "Density", 
+     freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+
+for (i in 1:3) {
+  lines(xx, manual_crisp_props_3[i] * dnorm(xx, mean = manual_crisp_mean_3[i], sd = manual_crisp_sd_3[i]), 
+        col = colours_3[i], lwd = 2)
+}
+
+total_density_crisp_3 <- rowSums(sapply(1:3, function(i) manual_crisp_props_3[i] * dnorm(xx, mean = manual_crisp_mean_3[i], sd = manual_crisp_sd_3[i])))
+lines(xx, total_density_crisp_3, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("Class 1", "Class 2", "Class 3", "Total Mixture"), 
+       col = c(colours_3, "black"), lwd = 2, lty = c(1, 1, 1, 2))
+
+```
+
+#### Mclust
+
+```{r}
+mclust_means_3 <- mclust_em_3$parameters$mean
+mclust_sds_3 <- sqrt(mclust_em_3$parameters$variance$sigmasq)
+mclust_props_3 <- mclust_em_3$parameters$pro
+
+hist(data_summary$mean_HR, col = "lightgray", border = "white",
+     main = "Mclust Package (3 Classes)",
+     xlab = "Mean Heart Rate (bpm)", ylab = "Density", 
+     freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+
+for (i in 1:3) {
+  lines(xx, mclust_props_3[i] * dnorm(xx, mean = mclust_means_3[i], sd = mclust_sds_3), 
+        col = colours_3[i], lwd = 2)
+}
+
+total_density_mclust_3 <- rowSums(sapply(1:3, function(i) mclust_props_3[i] * dnorm(xx, mean = mclust_means_3[i], sd = mclust_sds_3)))
+lines(xx, total_density_mclust_3, col = "black", lwd = 2, lty = 2)
+
+legend("topright", legend = c("Class 1", "Class 2", "Class 3", "Total Mixture"), 
+       col = c(colours_3, "black"), lwd = 2, lty = c(1, 1, 1, 2))
+
+```
+
+#### 3LM Comparision
+
+```{r}
+# Set up a Layout Matrix (1 row x 4 columns)
+# The 4th column is dedicated to the legend and made slightly wider (0.6)
+layout_matrix <- matrix(c(1, 2, 3, 4), nrow = 1)
+layout(layout_matrix, widths = c(1, 1, 1, 0.6))
+
+# Set margins for the main histogram plots
+par(mar = c(4, 4, 3, 1))
+
+#  Plot 1: Soft Manual 
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Soft Manual (m=3)", xlab = "Mean HR", ylab = "Density", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:3) lines(xx, manual_soft_props_3[i] * dnorm(xx, mean = manual_soft_mean_3[i], sd = manual_soft_sd_3[i]), col = colours_3[i], lwd = 2)
+
+#  Plot 2: Crisp Manual 
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Crisp Manual (m=3)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:3) lines(xx, manual_crisp_props_3[i] * dnorm(xx, mean = manual_crisp_mean_3[i], sd = manual_crisp_sd_3[i]), col = colours_3[i], lwd = 2)
+
+#  Plot 3: Mclust 
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Mclust Package (m=3)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:3) lines(xx, mclust_props_3[i] * dnorm(xx, mean = mclust_means_3[i], sd = mclust_sds_3), col = colours_3[i], lwd = 2)
+
+#  Plot 4: LEGEND PANEL 
+par(mar = c(0, 0, 0, 0)) # Remove all margins so the legend centres perfectly
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "") # Draw an invisible canvas
+legend("center", legend = paste("Class", 1:3), col = colours_3, lwd = 3, cex = 1.2, title = "Latent Classes", bty = "n")
+
+# Restore the original graphical layout
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+### Global comparision
+
+```{r}
+# Global Comparison (m=2 and m=3 together)
+
+# Set up a Layout Matrix
+# This creates a 2x4 grid. 
+# Plots 1, 2, 3 go on the top row. Plots 4, 5, 6 go on the bottom row.
+# Plot 7 (the legend) spans the entire 4th column across both rows.
+layout_matrix <- matrix(c(1, 2, 3, 7,
+                          4, 5, 6, 7), nrow = 2, byrow = TRUE)
+
+# Apply the layout, making the legend column narrower than the plot columns
+layout(layout_matrix, widths = c(1, 1, 1, 0.6))
+
+# Set margins for the main histogram plots
+par(mar = c(4, 4, 3, 1))
+
+#  ROW 1: 2 CLASSES 
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Soft Manual (m=2)", xlab = "Mean HR", ylab = "Density", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:2) lines(xx, manual_soft_props_2[i] * dnorm(xx, mean = manual_soft_mean_2[i], sd = manual_soft_sd_2[i]), col = colours_2[i], lwd = 2)
+
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Crisp Manual (m=2)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:2) lines(xx, manual_crisp_props_2[i] * dnorm(xx, mean = manual_crisp_mean_2[i], sd = manual_crisp_sd_2[i]), col = colours_2[i], lwd = 2)
+
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Mclust Package (m=2)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:2) lines(xx, mclust_props_2[i] * dnorm(xx, mean = mclust_means_2[i], sd = mclust_sds_2), col = colours_2[i], lwd = 2)
+
+
+#  ROW 2: 3 CLASSES 
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Soft Manual (m=3)", xlab = "Mean HR", ylab = "Density", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:3) lines(xx, manual_soft_props_3[i] * dnorm(xx, mean = manual_soft_mean_3[i], sd = manual_soft_sd_3[i]), col = colours_3[i], lwd = 2)
+
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Crisp Manual (m=3)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:3) lines(xx, manual_crisp_props_3[i] * dnorm(xx, mean = manual_crisp_mean_3[i], sd = manual_crisp_sd_3[i]), col = colours_3[i], lwd = 2)
+
+hist(data_summary$mean_HR, col = "lightgray", border = "white", main = "Mclust Package (m=3)", xlab = "Mean HR", ylab = "", freq = FALSE, ylim = c(0, 0.08), xlim = c(x_min, x_max))
+for (i in 1:3) lines(xx, mclust_props_3[i] * dnorm(xx, mean = mclust_means_3[i], sd = mclust_sds_3), col = colours_3[i], lwd = 2)
+
+
+#  LEGEND PANEL (Plot 7) 
+# Remove all margins so the legend is centred perfectly in its dedicated space
+par(mar = c(0, 0, 0, 0))
+
+# Draw an empty, invisible plot to act as a canvas for the legend
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")
+
+# Draw the legend in the centre of this new empty panel
+legend("center", legend = paste("Class", 1:3), col = colours_3, lwd = 3, cex = 1.2, title = "Latent Classes", bty = "n")
+
+# Restore the original graphical layout so future plots are not affected
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+A visual comparison of the density estimates reveals significant differences in how the algorithms handle the underlying structure of the data. For $m=2$, both the Crisp manual implementation and the `mclust` package successfully capture the bimodal nature of the clinical data, separating the patients into distinct lower and higher heart rate groups. Conversely, the Soft manual algorithm struggles, modelling one highly concentrated central class and a broad, flat secondary distribution that acts more like background noise than a distinct physiological cohort.
+
+When expanding to three latent classes ($m=3$), the mathematical limitations of the manual Crisp EM become highly apparent. The algorithm produces an unnaturally sharp, narrow density spike (Class 1). Because the Crisp method relies on rigid, binary assignments ($0$ or $1$) during the Expectation step, it is prone to trapping a small number of similar data points into a cluster with near-zero variance, which lacks biological plausibility. In contrast, `mclust` handles the $m=3$ complexity gracefully, identifying a dominant central group alongside two realistic, wider tails representing unusually low and high heart rates. Overall, the `mclust` package demonstrates the highest stability and yields the most physiologically interpretable density curves
+
+# 5. Plot the mean HR as a function of each subject's age in which each point has a color corresponding to the class to which it belongs
+
+```{r}
+# Setup parameters
+# Lock Y-axis limits for fair visual comparison across all scatter plots
+y_limits <- c(min(data_summary$mean_HR, na.rm = TRUE) - 5, 
+              max(data_summary$mean_HR, na.rm = TRUE) + 5)
+```
+
+### 2 latent classes
+
+#### Soft (manual)
+
+```{r}
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_2[manual_soft_classes_2], pch = 16, cex = 1.2,
+     main = "Soft Manual (2 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:2), col = colours_2, pch = 16, title = "Classification")
+```
+
+#### Crisp (manual)
+
+```{r}
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_2[manual_crisp_classes_2], pch = 16, cex = 1.2,
+     main = "Crisp Manual (2 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:2), col = colours_2, pch = 16, title = "Classification")
+```
+
+#### Mclust
+
+```{r}
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_2[mclust_em_2$classification], pch = 16, cex = 1.2,
+     main = "Mclust Package (2 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:2), col = colours_2, pch = 16, title = "Classification")
+```
+
+#### 2LM Comparision
+
+```{r}
+# Set up a Layout Matrix (3 rows x 2 columns)
+# The first column contains plots 1, 2, and 3 stacked vertically.
+# The second column merges to contain plot 4 (the legend) across all rows.
+layout_matrix <- matrix(c(1, 4,
+                          2, 4,
+                          3, 4), nrow = 3, byrow = TRUE)
+
+# Apply the layout. The plot column gets full width (1), the legend column is narrower (0.3)
+layout(layout_matrix, widths = c(1, 0.3))
+par(mar = c(4, 4, 3, 1))
+
+# Plot 1: Soft Manual (m=2) 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[manual_soft_classes_2], pch = 16, cex = 1.2, main = "Soft Manual (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+# Plot 2: Crisp Manual (m=2) 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[manual_crisp_classes_2], pch = 16, cex = 1.2, main = "Crisp Manual (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+# Plot 3: Mclust (m=2) 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[mclust_em_2$classification], pch = 16, cex = 1.2, main = "Mclust Package (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+# Plot 4: LEGEND PANEL 
+par(mar = c(0, 0, 0, 0)) 
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "") 
+legend("center", legend = paste("Class", 1:2), col = colours_2, pch = 16, cex = 1.5, title = "Latent Classes", bty = "n")
+
+# Restore the original graphical parameters
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+### 3 latent classes
+
+#### Soft (manual)
+
+```{r}
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[manual_soft_classes_3], pch = 16, cex = 1.2,
+     main = "Soft Manual (3 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:3), col = colours_3, pch = 16, title = "Classification")
+```
+
+#### Crisp (manual)
+
+```{r}
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[manual_crisp_classes_3], pch = 16, cex = 1.2,
+     main = "Crisp Manual (3 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:3), col = colours_3, pch = 16, title = "Classification")
+```
+
+#### Mclust
+
+```{r}
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[mclust_em_3$classification], pch = 16, cex = 1.2,
+     main = "Mclust Package (3 Classes)", xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+legend("topright", legend = paste("Class", 1:3), col = colours_3, pch = 16, title = "Classification")
+```
+
+#### 3LM Comparision
+
+```{r}
+# Set up a Layout Matrix (3 rows x 2 columns)
+# The first column contains the three plots (1, 2, 3)
+# The second column contains the legend (4) spanning all three rows
+layout_matrix_3 <- matrix(c(1, 4,
+                            2, 4,
+                            3, 4), nrow = 3, byrow = TRUE)
+
+# Apply layout: Main plots get width 1, legend column gets 0.3
+layout(layout_matrix_3, widths = c(1, 0.3))
+par(mar = c(4, 4, 3, 1))
+
+# Plot 1: Soft Manual (m=3) 
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[manual_soft_classes_3], 
+     pch = 16, cex = 1.2, 
+     main = "Soft Manual (m=3)", 
+     xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+
+# Plot 2: Crisp Manual (m=3) 
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[manual_crisp_classes_3], 
+     pch = 16, cex = 1.2, 
+     main = "Crisp Manual (m=3)", 
+     xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+
+# Plot 3: Mclust Package (m=3) 
+plot(data_summary$age, data_summary$mean_HR, 
+     col = colours_3[mclust_em_3$classification], 
+     pch = 16, cex = 1.2, 
+     main = "Mclust Package (m=3)", 
+     xlab = "Age (years)", ylab = "Mean HR (bpm)", 
+     ylim = y_limits)
+
+# Plot 4: LEGEND PANEL 
+# Remove margins for the dedicated legend column
+par(mar = c(0, 0, 0, 0)) 
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "") 
+
+# Centre the legend vertically relative to the three plots
+legend("center", legend = paste("Class", 1:3), 
+       col = colours_3, pch = 16, cex = 1.5, 
+       title = "Latent Classes", bty = "n")
+
+# Reset layout and margins for the rest of the document
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+### Global Comparision
+
+```{r}
+# Global Comparison Scatter Plots - Vertical Matrix Layout
+# Create a 3x3 layout matrix:
+# Col 1: m=2 models | Col 2: m=3 models | Col 3: Shared Legend
+layout_matrix_global <- matrix(c(1, 2, 7,
+                                 3, 4, 7,
+                                 5, 6, 7), nrow = 3, byrow = TRUE)
+
+# Apply layout: Plots get equal width (1), legend column is narrower (0.4)
+layout(layout_matrix_global, widths = c(1, 1, 0.4))
+par(mar = c(4, 4, 3, 1))
+
+# ROW 1: SOFT MANUAL 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[manual_soft_classes_2], 
+     pch = 16, cex = 1.2, main = "Soft Manual (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+plot(data_summary$age, data_summary$mean_HR, col = colours_3[manual_soft_classes_3], 
+     pch = 16, cex = 1.2, main = "Soft Manual (m=3)", xlab = "Age", ylab = "", ylim = y_limits)
+
+
+# ROW 2: CRISP MANUAL 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[manual_crisp_classes_2], 
+     pch = 16, cex = 1.2, main = "Crisp Manual (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+plot(data_summary$age, data_summary$mean_HR, col = colours_3[manual_crisp_classes_3], 
+     pch = 16, cex = 1.2, main = "Crisp Manual (m=3)", xlab = "Age", ylab = "", ylim = y_limits)
+
+
+# ROW 3: MCLUST PACKAGE 
+plot(data_summary$age, data_summary$mean_HR, col = colours_2[mclust_em_2$classification], 
+     pch = 16, cex = 1.2, main = "Mclust Package (m=2)", xlab = "Age", ylab = "Mean HR", ylim = y_limits)
+
+plot(data_summary$age, data_summary$mean_HR, col = colours_3[mclust_em_3$classification], 
+     pch = 16, cex = 1.2, main = "Mclust Package (m=3)", xlab = "Age", ylab = "", ylim = y_limits)
+
+
+# SHARED LEGEND PANEL (Plot 7) 
+par(mar = c(0, 0, 0, 0))
+plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")
+# Centred legend explaining the 3-class colour scheme used across the matrix
+legend("center", legend = paste("Class", 1:3), col = colours_3, 
+       pch = 16, cex = 1.5, title = "Latent Classes", bty = "n")
+
+# Restore original settings
+layout(1)
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+Mapping the latent class assignments against patient Age and Mean HR reveals the practical decision boundaries established by each EM algorithm. Across all models, the stratification occurs almost exclusively along the Y-axis (Mean HR). The horizontal nature of these class boundaries indicates that Age does not exert a confounding or clustering effect in this specific parameterization. Patients are strictly grouped into physiological heart rate tiers irrespective of their demographic age.
+
+Comparing the algorithms highlights the mechanical differences between probabilistic and deterministic clustering. The manual Crisp EM and the `mclust` package display rigid, highly distinct horizontal decision boundaries. In contrast, the manual Soft EM exhibits slight overlaps in classification near the boundaries, accurately reflecting its probabilistic nature where borderline patients retain fractional memberships.
+
+Furthermore, the transition from $m=2$ to $m=3$ clearly illustrates the subdivision of the clinical cohort. The 2-class models partition the data into 'standard' and 'elevated' heart rates, whereas the 3-class models introduce a distinct uppermost tier (Class 3 / Purple), isolating the subset of patients exhibiting severe tachycardia.
 
 # 6. Generate 1000 data points at random according to a single distribution fitted to the original data.
 
+```{r}
+n <- 1000
+set.seed(523)
+
+# Generate points assuming the entire dataset follows one single Normal distribution
+sample.simple <- rnorm(n, 
+                       mean=mean(data_summary$mean_HR), 
+                       sd=sd(data_summary$mean_HR))
+
+# Dynamically lock the X-axis limits for a fair visual comparison
+x_limits <- c(min(data_summary$mean_HR, sample.simple) - 10, 
+              max(data_summary$mean_HR, sample.simple) + 10)
+
+# Set up a 1x2 side-by-side graphical layout
+par(mfrow = c(1, 2), mar = c(5, 4, 4, 2) + 0.1)
+
+# Plot 1: Observed real data
+hist(data_summary$mean_HR, main="Observed Data", xlab="Mean HR", 
+     freq=F, breaks = 7, col="lightgray", xlim = x_limits, ylim = c(0, 0.05))
+lines(density(data_summary$mean_HR), col=2, lwd=2)
+
+# Plot 2: Generated data (single distribution)
+hist(sample.simple,  main="Generated Data\n(single distribution)",
+     xlab="Mean HR", freq=F, breaks=7, col="lightgray",xlim = x_limits,
+     ylim = c(0, 0.05))
+lines(density(sample.simple), col="darkblue", lwd=2)
+
+par(mfrow=c(1,1)) # Reset graphical parameters
+
+```
+
+A comparative visual analysis between the empirical clinical data and the synthetic single-distribution sample highlights the severe limitations of modelling this patient cohort with a simple Gaussian curve. The observed data (left) is distinctly non-normal, it exhibits a primary central peak alongside a noticeable secondary shoulder towards the higher heart rate spectrum, indicating physiological heterogeneity within the sample.
+
+Conversely, generating data from a single global mean and standard deviation (right) forces these distinct sub-populations into a single, symmetrical bell curve. This monolithic approach smooths over the critical clinical nuances, effectively masking the presence of patients with elevated heart rates. This stark visual disparity mathematically justifies the necessity of the Gaussian Mixture Models (computed via the EM algorithm) to accurately capture the multi-class complexity of the real-world dataset.
+
 # 7. Generate 1000 data points at random according to a mixture of distributions fitted using one of the previous EM computed in 3.
+
+To generate the synthetic mixture sample, the **Manual Crisp model with 2 latent classes (m=2)** was selected. Visual inspection of the density plots from Section 4 demonstrated that this model provided the most accurate fit to the bimodal structure of the observed heart rate data.
+
+```{r}
+n <- 1000
+set.seed(523)
+m <- 2
+
+# Assign each of the 1000 points to a class based on the calculated proportions
+sample.classes <- sample(1:m, size=n, replace=T, prob=manual_crisp_props_2)
+sample.prop <- prop.table(table(sample.classes))
+
+# Generate continuous normal data for each class iteratively
+sample.values <- unlist(sapply(1:m, function(j){
+  rnorm(n*sample.prop[j], mean=manual_crisp_mean_2[j], sd=manual_crisp_sd_2[j])
+}))
+
+# Dynamically lock the X-axis limits
+x_limits_mix <- c(min(data_summary$mean_HR, sample.values) - 10, 
+                  max(data_summary$mean_HR, sample.values) + 10)
+
+# Set up side-by-side plots for visual comparison
+par(mfrow = c(1, 2), mar = c(5, 4, 4, 2) + 0.1)
+
+# Plot 1: Observed Data
+hist(data_summary$mean_HR, main="Observed Data", xlab="Mean HR", 
+     freq=F, breaks = 7, col="lightgray", xlim = x_limits_mix, ylim = c(0, 0.05))
+lines(density(data_summary$mean_HR), col=2, lwd=2)
+
+# Plot 2: Generated mixture distribution
+hist(sample.values,  main=paste("Generated data\n(Mixture m = 2)"), xlab="Mean HR", freq=F, breaks = 7, col="lightgray",xlim = x_limits_mix, ylim = c(0, 0.05))
+lines(density(sample.values), col="darkblue", lwd=2)
+
+par(mfrow=c(1,1)) # Reset graphical parameters
+```
+
+In contrast to the monolithic single-distribution approach, the synthetic data generated from the 2-class mixture model successfully replicates the complex physiological profile of the clinical cohort. By sampling from the proportional, mean, and variance parameters derived via the Expectation-Maximisation algorithm, the generated density curve (right) accurately reconstructs both the dominant central peak and the critical secondary shoulder representing patients with elevated heart rates. This visual alignment validates the 2-class mixture model as a statistically robust framework, proving its capacity to simulate the heterogeneous cardiac states inherent to critical care data.
+
+# Final Comments
+
+This analysis conclusively demonstrates that the heart rate profiles of critically ill patients are intrinsically heterogeneous and cannot be accurately modelled by a simple, single distribution. By applying EM algorithms, we successfully unmasked the hidden sub-populations within the clinical dataset.
+
+Through a comparative evaluation of clustering techniques, distinct methodological strengths and weaknesses emerged. The manual Soft EM algorithm struggled to define clear physiological cohorts, treating secondary patient groups as broad mathematical variance. Conversely, the manual Crisp implementation (for m = 2) and the automated `mclust` package provided mathematically rigorous and clinically plausible partitions, effectively isolating standard heart rates from elevated, tachycardic states. Furthermore, mapping these classifications against patient age confirmed that these boundaries are strictly physiological, not demographic.
+
+Ultimately, validating these parameters through synthetic data generation proved that Gaussian Mixture Models, particularly those derived from rigid assignment or the `mclust` architecture, are highly effective statistical tools for capturing, classifying, and simulating complex, multi-state medical data.
