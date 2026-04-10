@@ -156,56 +156,41 @@ round(prop.table(table(cohort$Gender, cohort$SmokingStatus), margin = 1) * 100, 
 
 # Block 2: Risk Combination and Conversion to Annual Rates
 
-Implementing the risk calculation logic is the most critical step in our model. We start with the base cumulative risks for disease and death, then apply multiplicative modifiers based on the individual's risk factors (smoking status, age
+Since the provided risks are cumulative over 5 or 10 years, we need to convert them into annual transition probabilities. We will use the formula for converting cumulative probability to a rate, and then back to an annual probability. This process is done separately for disease risk and death risk, based on the relevant risk factors. The assumption of independence allows us to simply sum the rates for each risk factor to get a total rate for each individual, which we then convert back to an annual probability.
+
+## Disease Risk
 
 ```{r}
-# Risk Calculation Logic
-# Base risks
-base_risk_disease_5yr <- 0.176
-base_risk_death_10yr <- 0.115
-# Risk modifiers
-risk_modifiers <- list(
-  Disease = list(
-    Smoking = c("Smoker" = 0.503, "Non-Smoker" = 0.054),
-    AgeGroup = c(">=50" = 0.221, "<50" = 0.132)
-  ),
-  Death = list(
-    AgeGroup = c(">=50" = 0.229, "<50" = 0.010),
-    Sex = c("Male" = 0.123, "Female" = 0.106)
-  )
-)
+# Function to convert probability to rate
+prob_to_rate <- function(p, t) { -log(1 - p) / t }
+
+# Convert 5-year probabilities to rates for each risk factor
+r_smoker <- prob_to_rate(0.503, 5)
+r_non_smoker <- prob_to_rate(0.054, 5)
+r_old <- prob_to_rate(0.221, 5)
+r_young <- prob_to_rate(0.132, 5)
+
+# Combine rates for each individual based on their risk factors
+totalrate_disease <- ifelse(cohort$SmokingStatus == "Smoker", r_smoker, r_non_smoker) +
+                            ifelse(cohort$AgeGroup == ">=50", r_old, r_young)
+
+# Convert total rates back to yearly probabilities
+cohort$YearlyRisk_Disease <- 1 - exp(-totalrate_disease * 1)
 ```
 
-The cumulative risks are calculated by multiplying the base risk with the appropriate modifiers for each individual's characteristics.
+## Death Risk
 
 ```{r}
-# Calculate individual risks
-cohort$Risk_Disease_5yr <- base_risk_disease_5yr * ifelse(
-        cohort$SmokingStatus == "Smoker", 
-        risk_modifiers$Disease$Smoking["Smoker"],
-        risk_modifiers$Disease$Smoking["Non-Smoker"]
-        ) * ifelse(
-                cohort$AgeGroup == ">=50", 
-                risk_modifiers$Disease$AgeGroup[">=50"],
-                risk_modifiers$Disease$AgeGroup["<50"]
-                )
-cohort$Risk_Death_10yr <- base_risk_death_10yr *  ifelse(
-        cohort$AgeGroup == ">=50", 
-        risk_modifiers$Death$AgeGroup[">=50"],
-        risk_modifiers$Death$AgeGroup["<50"]
-        ) *  ifelse(
-                cohort$Gender == "Male", 
-                risk_modifiers$Death$Sex["Male"],
-                risk_modifiers$Death$Sex["Female"]
-                )
-```
-
-After obtaining the cumulative risks, we convert them to annual rates using the formula: $$\text{Yearly Risk} = -\frac{\log(1 - \text{Cumulative Risk})}{\text{Time Period}}$$ This conversion assumes a constant hazard rate over the specified time period, which is a common approach in Markov models to derive transition probabilities from cumulative risks
-
-```{r}
-# Convert cumulative risks to annual rates
-cohort$YearlyRisk_Disease <- -log(1 - cohort$Risk_Disease_5yr) / 5
-cohort$YearlyRisk_Death <- -log(1 - cohort$Risk_Death_10yr) / 10
+# Convert 10-year probabilities to rates for each risk factor
+r_old_death <- prob_to_rate(0.229, 10)
+r_young_death <- prob_to_rate(0.010, 10)
+r_male_death <- prob_to_rate(0.123, 10)
+r_female_death <- prob_to_rate(0.106, 10)
+# Combine rates for each individual based on their risk factors
+totalrate_death <- ifelse(cohort$AgeGroup == ">=50", r_old_death, r_young_death) +
+                   ifelse(cohort$Gender == "Male", r_male_death, r_female_death)
+# Convert total rates back to yearly probabilities
+cohort$YearlyRisk_Death <- 1 - exp(-totalrate_death * 1)
 ```
 
 # Block 3: Markov Chain and Results Analysis
