@@ -69,7 +69,7 @@ The foundation of our model requires generating a baseline population of 100,000
 
 ```{r}
 
-# Reprodutibility and sample size
+# Reproducibility and sample size
 set.seed(9) 
 N <- 100000
 
@@ -185,8 +185,8 @@ r_female_death <- prob_to_rate(0.106, 10)
 # Convert total rates back to yearly probabilities
 cohort$YearlyRisk_Death_Old <- 1 - exp(-r_old_death * 1)
 cohort$YearlyRisk_Death_Young <- 1 - exp(-r_young_death * 1)
-cohort$YearlyRisk_Death_Male <- 1 - exp(r_male_death * 1)
-cohort$YearlyRisk_Death_Female <- 1 - exp(r_female_death * 1)
+cohort$YearlyRisk_Death_Male <- 1 - exp(-r_male_death * 1)
+cohort$YearlyRisk_Death_Female <- 1 - exp(-r_female_death * 1)
 ```
 
 ## Total Risk Calculation
@@ -194,7 +194,7 @@ cohort$YearlyRisk_Death_Female <- 1 - exp(r_female_death * 1)
 To check the answers obtained in the simulation we can calculate the total risk of disease in 10 years for the population and use it and the 10-year risk of any-cause mortality as a benchmark.
 
 ```{r}
-# Convert 5-year probabilitie of risk of disse to rate
+# Convert 5-year probability of risk of disse to rate
 r_disease <- prob_to_rate(0.176, 5)
 
 # Convert year rates back to 10-year probability
@@ -214,11 +214,11 @@ Based on the cumulative probabilities, the answers are the following:
 
 1.  How many of the patients developed the disease after 10 years?
 
-After 10 years the number of patients that developed the disease is `num_disease`.
+After 10 years the number of patients that developed the disease is `r num_disease`.
 
 2.  How many of the patients died after 10 years?
 
-After 10 years the number of patients that died is `num_death`.
+After 10 years the number of patients that died is `r num_death`.
 
 # Block 3: Markov Chain and Results Analysis
 
