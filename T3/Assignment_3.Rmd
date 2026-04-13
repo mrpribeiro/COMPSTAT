@@ -65,8 +65,7 @@ Based on the simulation, answer the following:
 
 # Block 1: Initial Cohort Generation
 
-The foundation of our model requires generating a baseline population of 100,000 individuals (Time 0). To ensure the strict reproducibility required by Monte Carlo simulations, we begin by defining a fixed seed.
-We generate the independent demographic variables (Gender and Age Group) using simple sampling with replacement, adhering to the marginal probabilities provided in the assignment (48% male; 45% aged 50 or older).
+The foundation of our model requires generating a baseline population of 100,000 individuals (Time 0). To ensure the strict reproducibility required by Monte Carlo simulations, we begin by defining a fixed seed. We generate the independent demographic variables (Gender and Age Group) using simple sampling with replacement, adhering to the marginal probabilities provided in the assignment (48% male; 45% aged 50 or older).
 
 ```{r}
 
@@ -132,10 +131,6 @@ cohort <- data.frame(
   SmokingStatus = factor(pop_smoke, levels = c("Non-Smoker", "Smoker"))
 )
 
-# Added already required blank columns to be filled later
-cohort$YearlyRisk_Disease <- NA
-cohort$YearlyRisk_Death <- NA
-
 # View dataframe
 cohort
 ```
@@ -171,12 +166,11 @@ r_non_smoker <- prob_to_rate(0.054, 5)
 r_old <- prob_to_rate(0.221, 5)
 r_young <- prob_to_rate(0.132, 5)
 
-# Combine rates for each individual based on their risk factors
-totalrate_disease <- ifelse(cohort$SmokingStatus == "Smoker", r_smoker, r_non_smoker) +
-                            ifelse(cohort$AgeGroup == ">=50", r_old, r_young)
-
-# Convert total rates back to yearly probabilities
-cohort$YearlyRisk_Disease <- 1 - exp(-totalrate_disease * 1)
+# Convert rates back to yearly probabilities
+cohort$YearlyRisk_Disease_Smoker <- 1 - exp(-r_smoker * 1)
+cohort$YearlyRisk_Disease_NonSmoker <- 1 - exp(-r_non_smoker * 1)
+cohort$YearlyRisk_Disease_Old <- 1 - exp(-r_old * 1)
+cohort$YearlyRisk_Disease_Young <- 1 - exp(-r_young * 1)
 ```
 
 ## Death Risk
@@ -187,12 +181,44 @@ r_old_death <- prob_to_rate(0.229, 10)
 r_young_death <- prob_to_rate(0.010, 10)
 r_male_death <- prob_to_rate(0.123, 10)
 r_female_death <- prob_to_rate(0.106, 10)
-# Combine rates for each individual based on their risk factors
-totalrate_death <- ifelse(cohort$AgeGroup == ">=50", r_old_death, r_young_death) +
-                   ifelse(cohort$Gender == "Male", r_male_death, r_female_death)
+
 # Convert total rates back to yearly probabilities
-cohort$YearlyRisk_Death <- 1 - exp(-totalrate_death * 1)
+cohort$YearlyRisk_Death_Old <- 1 - exp(-r_old_death * 1)
+cohort$YearlyRisk_Death_Young <- 1 - exp(-r_young_death * 1)
+cohort$YearlyRisk_Death_Male <- 1 - exp(r_male_death * 1)
+cohort$YearlyRisk_Death_Female <- 1 - exp(r_female_death * 1)
 ```
+
+## Total Risk Calculation
+
+To check the answers obtained in the simulation we can calculate the total risk of disease in 10 years for the population and use it and the 10-year risk of any-cause mortality as a benchmark.
+
+```{r}
+# Convert 5-year probabilitie of risk of disse to rate
+r_disease <- prob_to_rate(0.176, 5)
+
+# Convert year rates back to 10-year probability
+total_risk_disease <- 1 - exp(-r_disease * 10)
+
+# Calculate how many of the patients developed the disease after 10 years.
+num_disease <- round(total_risk_disease * N)
+num_disease
+
+# Calculate how many of the patients died after 10 years.
+total_risk_death <- 0.115
+num_death <- round(total_risk_death * N)
+num_death
+```
+
+Based on the cumulative probabilities, the answers are the following:
+
+1.  How many of the patients developed the disease after 10 years?
+
+After 10 years the number of patients that developed the disease is `num_disease`.
+
+2.  How many of the patients died after 10 years?
+
+After 10 years the number of patients that died is `num_death`.
 
 # Block 3: Markov Chain and Results Analysis
 
