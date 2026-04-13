@@ -1,0 +1,1579 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\ifLuaTeX
+  \usepackage{luacolor}
+  \usepackage[soul]{lua-ul}
+\else
+  \usepackage{soul}
+\fi
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Assignment\_2},
+  pdfauthor={João Silva, Marco Pereira, Mariana Ribeiro},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Assignment\_2}
+\author{João Silva, Marco Pereira, Mariana Ribeiro}
+\date{2026-03-27}
+
+\begin{document}
+\maketitle
+
+\section{Dataset description}\label{dataset-description}
+
+The original data was acquired from \textbf{critically-ill patients}
+during hospital care at the Beth Israel Deaconess Medical Centre
+(Boston, MA, USA). \textbf{Two annotators} manually annotated individual
+breaths in each recording using the impedance respiratory signal. The
+\textbf{53 recordings} within the dataset, each of \textbf{8-minute}
+duration, each contain:
+
+\begin{itemize}
+\tightlist
+\item
+  Physiological signals include the photoplethysmogram \textbf{(PPG)},
+  impedance respiratory signal, and electrocardiogram (\textbf{ECG}).
+  These are sampled at \textbf{125 Hz}.
+\item
+  Physiological parameters, such as the heart rate (\textbf{HR}),
+  respiratory rate (\textbf{RESP}), and blood oxygen saturation level
+  (\textbf{SpO2}). These are sampled at 1 Hz.
+\item
+  Fixed parameters, such as \textbf{age} and \textbf{gender}
+\item
+  \textbf{Manual annotations of breaths}
+\end{itemize}
+
+\section{Load packages}\label{load-packages}
+
+\begin{verbatim}
+## Loading required package: tidyverse
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'tidyverse' was built under R version 4.5.3
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'lubridate' was built under R version 4.5.3
+\end{verbatim}
+
+\begin{verbatim}
+## -- Attaching core tidyverse packages -------------------------------------------------------------------- tidyverse 2.0.0 --
+## v dplyr     1.2.0     v readr     2.2.0
+## v forcats   1.0.1     v stringr   1.6.0
+## v ggplot2   4.0.2     v tibble    3.3.1
+## v lubridate 1.9.5     v tidyr     1.3.2
+## v purrr     1.2.1
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts -------------------------------------------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+## Loading required package: mclust
+## 
+## Package 'mclust' version 6.1.2
+## Type 'citation("mclust")' for citing this R package in publications.
+## 
+## 
+## Attaching package: 'mclust'
+## 
+## 
+## The following object is masked from 'package:dplyr':
+## 
+##     count
+## 
+## 
+## The following object is masked from 'package:purrr':
+## 
+##     map
+\end{verbatim}
+
+\section{Exercise}\label{exercise}
+
+Using all the files available in
+\url{https://physionet.org/content/bidmc/1.0.0/}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Create an \textbf{object} containing the \textbf{mean HR and age} for
+  \textbf{each subject}.
+\item
+  \textbf{Plot the histogram} of all the \textbf{HR means} with the
+  respective \textbf{density curve}.
+\item
+  Apply the \textbf{expectation-maximization algorithm with 2 and 3
+  latent classes}.
+\item
+  \textbf{Plot the densities} for \textbf{each} of the \textbf{latent
+  classes}.
+\item
+  \textbf{Plot} the \textbf{mean} HR as a \textbf{function} of each
+  subject's \textbf{age} in which \textbf{each point} has a
+  \textbf{color} corresponding to the \textbf{class to which it
+  belongs}.
+\item
+  \textbf{Generate 1000 data points} at random according to a
+  \textbf{single distribution fitted to the original data}.
+\item
+  \textbf{Generate 1000 data points} at random according to a
+  \textbf{mixture of distributions} fitted using \textbf{one of the
+  previous EM} computed in 3.
+\end{enumerate}
+
+The submitted code file should include \textbf{comments} to improve
+readability.
+
+\href{\%5BNotes:\%5D(Notes:)\%7B.uri\%7D}{{[}Notes:\textbackslash\textbackslash{]}(Notes:)\{.uri\}}
+- the filenames vary between bidmc\_01 to bidmc\_53\\
+- the \textbf{bidmc\_XX\_Numerics.csv} contains four columns with the
+physiological parameters, such as the heart rate (\textbf{HR}),
+respiratory rate (RESP), and blood oxygen saturation level (SpO2). These
+are sampled at 1 Hz.\\
+- the \textbf{bidmc\_XX\_Fix.txt} contains the values of Fixed
+variables, such as \textbf{age} and gender.\\
+- the link to download the files are in the following format:\\
+``\url{https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Numerics.csv?download}''\strut \\
+and\\
+``\url{https://physionet.org/files/bidmc/1.0.0/bidmc_csv/bidmc_01_Fix.txt}''\strut \\
+- do not also forget to use the \textbf{functions density and EM}
+already \textbf{available in R}.
+
+\section{1. Download data and create a data frame containing the mean HR
+and age for each
+subject.}\label{download-data-and-create-a-data-frame-containing-the-mean-hr-and-age-for-each-subject.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Create empty data frame to store mean HR and age for each subject}
+\NormalTok{data\_summary }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{subject =} \FunctionTok{character}\NormalTok{(),}
+                           \AttributeTok{mean\_HR =} \FunctionTok{numeric}\NormalTok{(),}
+                           \AttributeTok{age =} \FunctionTok{numeric}\NormalTok{(),}
+                           \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}\NormalTok{)}
+\CommentTok{\# Loop through each subject\textquotesingle{}s files}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{53}\NormalTok{) \{}
+  \CommentTok{\# Create file links for numerics and fixed data}
+\NormalTok{  numerics\_file }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"https://physionet.org/files/bidmc/1.0.0/bidmc\_csv/bidmc\_"}\NormalTok{, }\FunctionTok{sprintf}\NormalTok{(}\StringTok{"\%02d"}\NormalTok{, i), }\StringTok{"\_Numerics.csv?download"}\NormalTok{)}
+\NormalTok{  fix\_file }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"https://physionet.org/files/bidmc/1.0.0/bidmc\_csv/bidmc\_"}\NormalTok{, }\FunctionTok{sprintf}\NormalTok{(}\StringTok{"\%02d"}\NormalTok{, i), }\StringTok{"\_Fix.txt?download"}\NormalTok{)}
+  
+  \CommentTok{\# Read the numerics data}
+\NormalTok{  numerics\_data }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(numerics\_file)}
+  
+  \CommentTok{\# Read the fixed data}
+\NormalTok{  fix\_data }\OtherTok{\textless{}{-}} \FunctionTok{readLines}\NormalTok{(fix\_file, }\AttributeTok{warn =} \ConstantTok{FALSE}\NormalTok{)}
+  
+  \CommentTok{\# Calculate mean HR}
+\NormalTok{  mean\_HR }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(numerics\_data}\SpecialCharTok{$}\NormalTok{HR, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+  
+  \CommentTok{\# Age extraction from fixed data: locate the line starting with "Age" dynamically}
+\NormalTok{  age\_line\_idx }\OtherTok{\textless{}{-}} \FunctionTok{grep}\NormalTok{(}\StringTok{"\^{}}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{s*Age"}\NormalTok{, fix\_data, }\AttributeTok{ignore.case =} \ConstantTok{TRUE}\NormalTok{)}
+    
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(age\_line\_idx) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{) \{}
+    \CommentTok{\# Extract numeric value safely using regex on the identified line}
+\NormalTok{    age\_str }\OtherTok{\textless{}{-}} \FunctionTok{sub}\NormalTok{(}\StringTok{".*?([0{-}9]+).*"}\NormalTok{, }\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{1"}\NormalTok{, fix\_data[age\_line\_idx[}\DecValTok{1}\NormalTok{]])}
+\NormalTok{    age }\OtherTok{\textless{}{-}} \FunctionTok{as.integer}\NormalTok{(age\_str)}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+    \CommentTok{\# Safe fallback if Age is missing from the file}
+\NormalTok{    age }\OtherTok{\textless{}{-}} \ConstantTok{NA} 
+\NormalTok{  \}}
+  
+  \CommentTok{\# Append to the summary data frame}
+\NormalTok{  data\_summary }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(data\_summary, }\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{subject =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"bidmc\_"}\NormalTok{,}
+                                                        \FunctionTok{sprintf}\NormalTok{(}\StringTok{"\%02d"}\NormalTok{, i)),}
+                                                        \AttributeTok{mean\_HR =}\NormalTok{ mean\_HR,}
+                                                        \AttributeTok{age =}\NormalTok{ age))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: NAs introduced by coercion
+\end{verbatim}
+
+\textbf{Note:} Subject 18 age is missing in the original file!
+
+\section{2. Plot the histogram of all the HR means with the respective
+density
+curve.}\label{plot-the-histogram-of-all-the-hr-means-with-the-respective-density-curve.}
+
+\subsection{\texorpdfstring{with \ul{Base
+R}}{with Base R}}\label{with-base-r}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot histogram of mean HR with density curve using base R}
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightblue"}\NormalTok{, }
+     \AttributeTok{main =} \StringTok{"Histogram of Mean HR with Density Curve"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Mean Heart Rate (HR)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{,}
+     \AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.04}\NormalTok{)) }\CommentTok{\# freq=FALSE to plot density instead of counts}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{density}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR), }\AttributeTok{col =} \StringTok{"red"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{) }\CommentTok{\# Add density curve}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-3-1.pdf}}
+
+\subsection{\texorpdfstring{with
+\ul{Ggplot2}}{with Ggplot2}}\label{with-ggplot2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot histogram of mean HR with density curve}
+\FunctionTok{ggplot}\NormalTok{(data\_summary, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ mean\_HR)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =} \FunctionTok{after\_stat}\NormalTok{(density)), }\AttributeTok{bins =} \DecValTok{10}\NormalTok{, }\AttributeTok{fill =} \StringTok{"lightblue"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+} \CommentTok{\# After stat(density) to plot density on the y{-}axis. The bars will represent the density instead of counts.}
+  \FunctionTok{geom\_density}\NormalTok{(}\AttributeTok{color =} \StringTok{"red"}\NormalTok{, }\AttributeTok{linewidth =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+} \CommentTok{\# Add density curve}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Histogram of Mean HR with Density Curve"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Mean Heart Rate (HR)"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Density"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-4-1.pdf}}
+
+\section{3. Apply the expectation-maximization algorithm with 2 and 3
+latent
+classes.}\label{apply-the-expectation-maximization-algorithm-with-2-and-3-latent-classes.}
+
+\subsection{- Manual implementation -}\label{manual-implementation--}
+
+\subsection{\textgreater{} Soft}\label{soft}
+
+\subsubsection{2 latent classes}\label{latent-classes}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# iteration 0}
+\NormalTok{m }\OtherTok{\textless{}{-}} \DecValTok{2} \CommentTok{\# number of latent classes}
+\NormalTok{eps }\OtherTok{\textless{}{-}} \FloatTok{0.01} \CommentTok{\# convergence error}
+\NormalTok{itera }\OtherTok{\textless{}{-}} \DecValTok{0} \CommentTok{\# iteration counter}
+\NormalTok{maxitera }\OtherTok{\textless{}{-}} \DecValTok{100} \CommentTok{\# maximum number of iterations}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{523}\NormalTok{) }\CommentTok{\# for reproducibility}
+\NormalTok{param.mean }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, m) }\CommentTok{\# initial mean values for the latent classes, randomly sampled from the data}
+\NormalTok{param.sd }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\FunctionTok{sd}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR) }\SpecialCharTok{/}\NormalTok{ m, m) }\CommentTok{\# initial standard deviation values for the latent classes, set to a fraction of the overall standard deviation of the data}
+
+\ControlFlowTok{for}\NormalTok{ (itera }\ControlFlowTok{in} \DecValTok{0}\SpecialCharTok{:}\NormalTok{maxitera) \{ }\CommentTok{\# EM algorithm loop}
+  \FunctionTok{names}\NormalTok{(param.mean) }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(}\StringTok{"mean"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m) }\CommentTok{\# assign names to the mean parameters for better readability}
+  \FunctionTok{names}\NormalTok{(param.sd) }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(}\StringTok{"sd"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m) }\CommentTok{\# assign names to the standard deviation parameters for better readability}
+  \FunctionTok{print}\NormalTok{(param.mean) }\CommentTok{\# print the current mean parameters for each latent class}
+  \FunctionTok{print}\NormalTok{(param.sd) }\CommentTok{\# print the current standard deviation parameters for each latent class}
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} E{-}Step}
+
+  \CommentTok{\# data points (mean HR for each subject)}
+\NormalTok{  xx }\OtherTok{\textless{}{-}}\NormalTok{ data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR }
+  \CommentTok{\# calculate the density of each data point under each latent class distribution}
+\NormalTok{  densities }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(i)\{}\FunctionTok{dnorm}\NormalTok{(xx,}\AttributeTok{mean=}\NormalTok{param.mean[i],}\AttributeTok{sd=}\NormalTok{param.sd[i])\})}
+  \CommentTok{\# calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities}
+\NormalTok{  relevance }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{apply}\NormalTok{(densities, }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(l)\{l}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{(l)\})) }
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} M{-}Step soft}
+
+  \CommentTok{\# update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point}
+\NormalTok{  param.mean.new }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}\FunctionTok{sum}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR}\SpecialCharTok{*}\NormalTok{relevance[,j])}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{(relevance[,j])\})}
+  \CommentTok{\# update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point}
+\NormalTok{  param.sd.new }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}\FunctionTok{sqrt}\NormalTok{(}\FunctionTok{sum}\NormalTok{(relevance[,j]}\SpecialCharTok{*}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR}\SpecialCharTok{{-}}\NormalTok{param.mean[j])}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{(relevance[,j]))\})}
+
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} Convergence}
+
+  \CommentTok{\# calculate the difference between the new and old mean parameters to check for convergence}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Iteration"}\NormalTok{,itera,}\StringTok{"evolution:"}\NormalTok{,dif }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(}\FunctionTok{abs}\NormalTok{(param.mean.new }\SpecialCharTok{{-}}\NormalTok{ param.mean)), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \CommentTok{\# if the difference is less than the convergence threshold, exit the loop}
+  \ControlFlowTok{if}\NormalTok{ (dif }\SpecialCharTok{\textless{}}\NormalTok{ eps) }\ControlFlowTok{break}
+\NormalTok{  param.mean }\OtherTok{\textless{}{-}}\NormalTok{ param.mean.new }\CommentTok{\# update the mean parameters for the next iteration}
+\NormalTok{  param.sd }\OtherTok{\textless{}{-}}\NormalTok{ param.sd.new }\CommentTok{\# update the standard deviation parameters for the next iteration}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   mean 1   mean 2 
+## 89.92308 84.50936 
+##     sd 1     sd 2 
+## 6.595841 6.595841 
+## Iteration 0 evolution: 7.954794 
+##   mean 1   mean 2 
+## 95.49203 82.12352 
+##      sd 1      sd 2 
+## 13.774525  9.773436 
+## Iteration 1 evolution: 1.372684 
+##   mean 1   mean 2 
+## 95.27537 83.27953 
+##      sd 1      sd 2 
+## 13.822498  9.036326 
+## Iteration 2 evolution: 0.6991008 
+##   mean 1   mean 2 
+## 94.98339 83.68666 
+##      sd 1      sd 2 
+## 14.369681  8.664633 
+## Iteration 3 evolution: 0.7632114 
+##   mean 1   mean 2 
+## 94.58334 84.04982 
+##      sd 1      sd 2 
+## 14.842972  8.360564 
+## Iteration 4 evolution: 0.7718059 
+##   mean 1   mean 2 
+## 94.16787 84.40616 
+##      sd 1      sd 2 
+## 15.257906  8.062875 
+## Iteration 5 evolution: 0.7361837 
+##   mean 1   mean 2 
+## 93.77246 84.74693 
+##      sd 1      sd 2 
+## 15.624436  7.754786 
+## Iteration 6 evolution: 0.6655866 
+##   mean 1   mean 2 
+## 93.41668 85.05674 
+##      sd 1      sd 2 
+## 15.939194  7.441426 
+## Iteration 7 evolution: 0.5649828 
+##   mean 1   mean 2 
+## 93.11521 85.32025 
+##      sd 1      sd 2 
+## 16.194930  7.141579 
+## Iteration 8 evolution: 0.4474125 
+##   mean 1   mean 2 
+## 92.87572 85.52817 
+##      sd 1      sd 2 
+## 16.388217  6.877789 
+## Iteration 9 evolution: 0.33238 
+##   mean 1   mean 2 
+## 92.69620 85.68103 
+##      sd 1      sd 2 
+## 16.523678  6.665169 
+## Iteration 10 evolution: 0.2353137 
+##   mean 1   mean 2 
+## 92.56739 85.78754 
+##      sd 1      sd 2 
+## 16.612765  6.506126 
+## Iteration 11 evolution: 0.1615249 
+##   mean 1   mean 2 
+## 92.47767 85.85934 
+##      sd 1      sd 2 
+## 16.668987  6.393456 
+## Iteration 12 evolution: 0.1088648 
+##   mean 1   mean 2 
+## 92.41641 85.90694 
+##      sd 1      sd 2 
+## 16.703845  6.316419 
+## Iteration 13 evolution: 0.0725833 
+##   mean 1   mean 2 
+## 92.37517 85.93829 
+##      sd 1      sd 2 
+## 16.725446  6.264879 
+## Iteration 14 evolution: 0.04807145 
+##   mean 1   mean 2 
+## 92.34768 85.95887 
+##      sd 1      sd 2 
+## 16.738941  6.230845 
+## Iteration 15 evolution: 0.0316992 
+##   mean 1   mean 2 
+## 92.32948 85.97237 
+##      sd 1      sd 2 
+## 16.747459  6.208544 
+## Iteration 16 evolution: 0.02084041 
+##   mean 1   mean 2 
+## 92.31749 85.98122 
+##     sd 1     sd 2 
+## 16.75289  6.19400 
+## Iteration 17 evolution: 0.01367148 
+##   mean 1   mean 2 
+## 92.30962 85.98702 
+##      sd 1      sd 2 
+## 16.756372  6.184541 
+## Iteration 18 evolution: 0.008953661
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Save manual soft 2{-}class parameters for plotting in parts 4 and 5}
+\NormalTok{manual\_soft\_mean\_2 }\OtherTok{\textless{}{-}}\NormalTok{ param.mean}
+\NormalTok{manual\_soft\_sd\_2 }\OtherTok{\textless{}{-}}\NormalTok{ param.sd}
+\CommentTok{\# In soft EM, crisp assignments for plotting are derived from the highest relevance}
+\NormalTok{manual\_soft\_classes\_2 }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(relevance, }\DecValTok{1}\NormalTok{, which.max) }
+\NormalTok{manual\_soft\_props\_2 }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{prop.table}\NormalTok{(}\FunctionTok{table}\NormalTok{(manual\_soft\_classes\_2)))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{3 latent classes}\label{latent-classes-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# iteration 0}
+\NormalTok{m }\OtherTok{\textless{}{-}} \DecValTok{3} \CommentTok{\# number of latent classes}
+\NormalTok{eps }\OtherTok{\textless{}{-}} \FloatTok{0.01} \CommentTok{\# convergence error}
+\NormalTok{itera }\OtherTok{\textless{}{-}} \DecValTok{0} \CommentTok{\# iteration counter}
+\NormalTok{maxitera }\OtherTok{\textless{}{-}} \DecValTok{100} \CommentTok{\# maximum number of iterations}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{523}\NormalTok{) }\CommentTok{\# for reproducibility}
+\NormalTok{param.mean }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, m) }\CommentTok{\# initial mean values for the latent classes, randomly sampled from the data}
+\NormalTok{param.sd }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\FunctionTok{sd}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR) }\SpecialCharTok{/}\NormalTok{ m, m) }\CommentTok{\# initial standard deviation values for the latent classes, set to a fraction of the overall standard deviation of the data}
+
+\ControlFlowTok{for}\NormalTok{ (itera }\ControlFlowTok{in} \DecValTok{0}\SpecialCharTok{:}\NormalTok{maxitera) \{ }\CommentTok{\# EM algorithm loop}
+  \FunctionTok{names}\NormalTok{(param.mean) }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(}\StringTok{"mean"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m) }\CommentTok{\# assign names to the mean parameters for better readability}
+  \FunctionTok{names}\NormalTok{(param.sd) }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(}\StringTok{"sd"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m) }\CommentTok{\# assign names to the standard deviation parameters for better readability}
+  \FunctionTok{print}\NormalTok{(param.mean) }\CommentTok{\# print the current mean parameters for each latent class}
+  \FunctionTok{print}\NormalTok{(param.sd) }\CommentTok{\# print the current standard deviation parameters for each latent class}
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} E{-}Step}
+
+  \CommentTok{\# data points (mean HR for each subject)}
+\NormalTok{  xx }\OtherTok{\textless{}{-}}\NormalTok{ data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR}
+  \CommentTok{\# calculate the density of each data point under each latent class distribution}
+\NormalTok{  densities }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(i)\{}\FunctionTok{dnorm}\NormalTok{(xx,}\AttributeTok{mean=}\NormalTok{param.mean[i],}\AttributeTok{sd=}\NormalTok{param.sd[i])\})}
+  \CommentTok{\# calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities}
+\NormalTok{  relevance }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{apply}\NormalTok{(densities, }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(l)\{l}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{(l)\}))}
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} M{-}Step soft}
+
+  \CommentTok{\# update the mean parameters for each latent class by calculating the weighted average of the data points, where the weights are given by the relevance of each latent class for each data point}
+\NormalTok{  param.mean.new }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}\FunctionTok{sum}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR}\SpecialCharTok{*}\NormalTok{relevance[,j])}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{(relevance[,j])\})}
+  \CommentTok{\# update the standard deviation parameters for each latent class by calculating the weighted standard deviation of the data points, where the weights are given by the relevance of each latent class for each data point}
+\NormalTok{  param.sd.new }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}\FunctionTok{sqrt}\NormalTok{(}\FunctionTok{sum}\NormalTok{(relevance[,j]}\SpecialCharTok{*}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR}\SpecialCharTok{{-}}\NormalTok{param.mean[j])}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{(relevance[,j]))\})}
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} Convergence}
+
+  \CommentTok{\# calculate the difference between the new and old mean parameters to check for convergence}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Iteration"}\NormalTok{,itera,}\StringTok{"evolution:"}\NormalTok{,dif }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(}\FunctionTok{abs}\NormalTok{(param.mean.new }\SpecialCharTok{{-}}\NormalTok{ param.mean)), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \CommentTok{\# if the difference is less than the convergence threshold, exit the loop}
+  \ControlFlowTok{if}\NormalTok{ (dif }\SpecialCharTok{\textless{}}\NormalTok{ eps) }\ControlFlowTok{break}
+\NormalTok{  param.mean }\OtherTok{\textless{}{-}}\NormalTok{ param.mean.new }\CommentTok{\# update the mean parameters for the next iteration}
+\NormalTok{  param.sd }\OtherTok{\textless{}{-}}\NormalTok{ param.sd.new }\CommentTok{\# update the standard deviation parameters for the next iteration}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    mean 1    mean 2    mean 3 
+##  89.92308  84.50936 110.43659 
+##     sd 1     sd 2     sd 3 
+## 4.397227 4.397227 4.397227 
+## Iteration 0 evolution: 5.429491 
+##    mean 1    mean 2    mean 3 
+##  90.57892  80.14105 110.84194 
+##     sd 1     sd 2     sd 3 
+## 4.972250 9.073721 8.172769 
+## Iteration 1 evolution: 2.664704 
+##    mean 1    mean 2    mean 3 
+##  89.66052  79.87895 109.35772 
+##     sd 1     sd 2     sd 3 
+## 4.956651 8.547468 9.399888 
+## Iteration 2 evolution: 2.830933 
+##    mean 1    mean 2    mean 3 
+##  89.07319  79.52541 107.46767 
+##      sd 1      sd 2      sd 3 
+##  4.872192  8.521550 10.381170 
+## Iteration 3 evolution: 2.478413 
+##    mean 1    mean 2    mean 3 
+##  88.65736  79.26047 105.67002 
+##      sd 1      sd 2      sd 3 
+##  4.806402  8.561599 11.200412 
+## Iteration 4 evolution: 1.980514 
+##    mean 1    mean 2    mean 3 
+##  88.37492  79.08167 104.15075 
+##      sd 1      sd 2      sd 3 
+##  4.773753  8.633388 11.842825 
+## Iteration 5 evolution: 1.427864 
+##    mean 1    mean 2    mean 3 
+##  88.19227  78.99463 102.99257 
+##      sd 1      sd 2      sd 3 
+##  4.767199  8.720343 12.327930 
+## Iteration 6 evolution: 0.9410272 
+##    mean 1    mean 2    mean 3 
+##  88.07787  78.98891 102.17167 
+##      sd 1      sd 2      sd 3 
+##  4.776700  8.809924 12.692877 
+## Iteration 7 evolution: 0.6838662 
+##    mean 1    mean 2    mean 3 
+##  88.00619  79.03992 101.61049 
+##      sd 1      sd 2      sd 3 
+##  4.794572  8.895304 12.969084 
+## Iteration 8 evolution: 0.5107999 
+##    mean 1    mean 2    mean 3 
+##  87.95918  79.12195 101.22874 
+##      sd 1      sd 2      sd 3 
+##  4.815961  8.973607 13.179543 
+## Iteration 9 evolution: 0.3917164 
+##    mean 1    mean 2    mean 3 
+##  87.92537  79.21573 100.96460 
+##      sd 1      sd 2      sd 3 
+##  4.838106  9.044073 13.341271 
+## Iteration 10 evolution: 0.3091606 
+##    mean 1    mean 2    mean 3 
+##  87.89825  79.30961 100.77645 
+##      sd 1      sd 2      sd 3 
+##  4.859562  9.106956 13.466890 
+## Iteration 11 evolution: 0.2505009 
+##    mean 1    mean 2    mean 3 
+##  87.87441  79.39775 100.63793 
+##      sd 1      sd 2      sd 3 
+##  4.879642  9.162921 13.565619 
+## Iteration 12 evolution: 0.2074586 
+##    mean 1    mean 2    mean 3 
+##  87.85228  79.47789 100.53274 
+##      sd 1      sd 2      sd 3 
+##  4.898073  9.212749 13.644126 
+## Iteration 13 evolution: 0.1748158 
+##    mean 1    mean 2    mean 3 
+##  87.83124  79.54964 100.45071 
+##      sd 1      sd 2      sd 3 
+##  4.914803  9.257193 13.707246 
+## Iteration 14 evolution: 0.1493094 
+##    mean 1    mean 2    mean 3 
+##  87.81110  79.61346 100.38536 
+##      sd 1      sd 2      sd 3 
+##  4.929889  9.296929 13.758517 
+## Iteration 15 evolution: 0.1288736 
+##    mean 1    mean 2    mean 3 
+##  87.79187  79.67014 100.33239 
+##      sd 1      sd 2      sd 3 
+##  4.943445  9.332544 13.800564 
+## Iteration 16 evolution: 0.1121661 
+##    mean 1    mean 2    mean 3 
+##  87.77362  79.72051 100.28885 
+##      sd 1      sd 2      sd 3 
+##  4.955601  9.364535 13.835360 
+## Iteration 17 evolution: 0.09828447 
+##    mean 1    mean 2    mean 3 
+##  87.75640  79.76535 100.25262 
+##      sd 1      sd 2      sd 3 
+##  4.966495  9.393325 13.864405 
+## Iteration 18 evolution: 0.08659985 
+##    mean 1    mean 2    mean 3 
+##  87.74026  79.80536 100.22218 
+##      sd 1      sd 2      sd 3 
+##  4.976255  9.419275 13.888850 
+## Iteration 19 evolution: 0.07665898 
+##    mean 1    mean 2    mean 3 
+##  87.72520  79.84114 100.19635 
+##      sd 1      sd 2      sd 3 
+##  4.985003  9.442694 13.909586 
+## Iteration 20 evolution: 0.0681256 
+##    mean 1    mean 2    mean 3 
+##  87.71122  79.87320 100.17426 
+##      sd 1      sd 2      sd 3 
+##  4.992848  9.463849 13.927308 
+## Iteration 21 evolution: 0.06074427 
+##    mean 1    mean 2    mean 3 
+##  87.69830  79.90199 100.15523 
+##      sd 1      sd 2      sd 3 
+##  4.999889  9.482975 13.942562 
+## Iteration 22 evolution: 0.05431715 
+##    mean 1    mean 2    mean 3 
+##  87.68639  79.92788 100.13871 
+##      sd 1      sd 2      sd 3 
+##  5.006213  9.500277 13.955777 
+## Iteration 23 evolution: 0.04868861 
+##    mean 1    mean 2    mean 3 
+##  87.67545  79.95120 100.12429 
+##      sd 1      sd 2      sd 3 
+##  5.011898  9.515938 13.967296 
+## Iteration 24 evolution: 0.04373456 
+##    mean 1    mean 2    mean 3 
+##  87.66541  79.97223 100.11163 
+##      sd 1      sd 2      sd 3 
+##  5.017012  9.530117 13.977393 
+## Iteration 25 evolution: 0.03935495 
+##    mean 1    mean 2    mean 3 
+##  87.65622  79.99122 100.10045 
+##      sd 1      sd 2      sd 3 
+##  5.021616  9.542962 13.986288 
+## Iteration 26 evolution: 0.03546823 
+##    mean 1    mean 2    mean 3 
+##  87.64783  80.00839 100.09054 
+##      sd 1      sd 2      sd 3 
+##  5.025765  9.554600 13.994160 
+## Iteration 27 evolution: 0.03200731 
+##    mean 1    mean 2    mean 3 
+##  87.64016  80.02392 100.08173 
+##      sd 1      sd 2      sd 3 
+##  5.029505  9.565147 14.001155 
+## Iteration 28 evolution: 0.0289165 
+##    mean 1    mean 2    mean 3 
+##  87.63318  80.03797 100.07385 
+##      sd 1      sd 2      sd 3 
+##  5.032880  9.574709 14.007392 
+## Iteration 29 evolution: 0.0261492 
+##    mean 1    mean 2    mean 3 
+##  87.62681  80.05070 100.06680 
+##      sd 1      sd 2      sd 3 
+##  5.035926  9.583379 14.012972 
+## Iteration 30 evolution: 0.02366606 
+##    mean 1    mean 2    mean 3 
+##  87.62102  80.06224 100.06047 
+##      sd 1      sd 2      sd 3 
+##  5.038677  9.591242 14.017976 
+## Iteration 31 evolution: 0.02143365 
+##    mean 1    mean 2    mean 3 
+##  87.61575  80.07271 100.05477 
+##      sd 1      sd 2      sd 3 
+##  5.041164  9.598374 14.022475 
+## Iteration 32 evolution: 0.01942335 
+##    mean 1    mean 2    mean 3 
+##  87.61095  80.08220 100.04963 
+##      sd 1      sd 2      sd 3 
+##  5.043412  9.604845 14.026528 
+## Iteration 33 evolution: 0.01761049 
+##    mean 1    mean 2    mean 3 
+##  87.60659  80.09081 100.04499 
+##      sd 1      sd 2      sd 3 
+##  5.045445  9.610715 14.030185 
+## Iteration 34 evolution: 0.01597368 
+##    mean 1    mean 2    mean 3 
+##  87.60263  80.09862 100.04079 
+##      sd 1      sd 2      sd 3 
+##  5.047285  9.616043 14.033489 
+## Iteration 35 evolution: 0.01449429 
+##    mean 1    mean 2    mean 3 
+##  87.59904  80.10572 100.03699 
+##      sd 1      sd 2      sd 3 
+##  5.048950  9.620878 14.036480 
+## Iteration 36 evolution: 0.01315596 
+##    mean 1    mean 2    mean 3 
+##  87.59577  80.11216 100.03354 
+##      sd 1      sd 2      sd 3 
+##  5.050458  9.625267 14.039188 
+## Iteration 37 evolution: 0.01194434 
+##    mean 1    mean 2    mean 3 
+##  87.59280  80.11801 100.03042 
+##      sd 1      sd 2      sd 3 
+##  5.051823  9.629251 14.041643 
+## Iteration 38 evolution: 0.01084669 
+##    mean 1    mean 2    mean 3 
+##  87.59010  80.12332 100.02758 
+##      sd 1      sd 2      sd 3 
+##  5.053061  9.632869 14.043870 
+## Iteration 39 evolution: 0.009851758
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Save manual soft 3{-}class parameters for plotting in parts 4 and 5}
+\NormalTok{manual\_soft\_mean\_3 }\OtherTok{\textless{}{-}}\NormalTok{ param.mean}
+\NormalTok{manual\_soft\_sd\_3 }\OtherTok{\textless{}{-}}\NormalTok{ param.sd}
+\CommentTok{\# In soft EM, crisp assignments for plotting are derived from the highest relevance}
+\NormalTok{manual\_soft\_classes\_3 }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(relevance, }\DecValTok{1}\NormalTok{, which.max)}
+\NormalTok{manual\_soft\_props\_3 }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{prop.table}\NormalTok{(}\FunctionTok{table}\NormalTok{(manual\_soft\_classes\_3)))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\textgreater{} Crisp}\label{crisp}
+
+\subsubsection{2 latent classes}\label{latent-classes-2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# iteration 0}
+\NormalTok{m }\OtherTok{\textless{}{-}} \DecValTok{2} \CommentTok{\# number of latent classes}
+\NormalTok{eps }\OtherTok{\textless{}{-}} \FloatTok{0.01} \CommentTok{\# convergence error}
+\NormalTok{itera }\OtherTok{\textless{}{-}} \DecValTok{0} \CommentTok{\# iteration counter}
+\NormalTok{maxitera }\OtherTok{\textless{}{-}} \DecValTok{100} \CommentTok{\# maximum number of iterations}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{523}\NormalTok{) }\CommentTok{\# for reproducibility}
+\NormalTok{param.mean }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, m) }\CommentTok{\# initial mean values for the latent classes, randomly sampled from the data}
+\NormalTok{param.sd }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\FunctionTok{sd}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR) }\SpecialCharTok{/}\NormalTok{ m, m) }\CommentTok{\# initial standard deviation values for the latent classes, set to a fraction of the overall standard deviation of the data}
+
+\ControlFlowTok{for}\NormalTok{ (itera }\ControlFlowTok{in} \DecValTok{0}\SpecialCharTok{:}\NormalTok{maxitera) \{ }\CommentTok{\# EM algorithm loop}
+  \FunctionTok{names}\NormalTok{(param.mean) }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(}\StringTok{"mean"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m) }\CommentTok{\# assign names to the mean parameters for better readability}
+  \FunctionTok{names}\NormalTok{(param.sd) }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(}\StringTok{"sd"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m) }\CommentTok{\# assign names to the standard deviation parameters for better readability}
+  \FunctionTok{print}\NormalTok{(param.mean) }\CommentTok{\# print the current mean parameters for each latent class}
+  \FunctionTok{print}\NormalTok{(param.sd) }\CommentTok{\# print the current standard deviation parameters for each latent class}
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} E{-}Step}
+ 
+  \CommentTok{\# data points (mean HR for each subject)}
+\NormalTok{  xx }\OtherTok{\textless{}{-}}\NormalTok{ data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR}
+  \CommentTok{\# calculate the density of each data point under each latent class distribution}
+\NormalTok{  densities }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(i)\{}\FunctionTok{dnorm}\NormalTok{(xx,}\AttributeTok{mean=}\NormalTok{param.mean[i],}\AttributeTok{sd=}\NormalTok{param.sd[i])\})}
+  \CommentTok{\# calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities }
+\NormalTok{  relevance }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{apply}\NormalTok{(densities, }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(l)\{l}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{(l)\})) }
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} M{-}Step crisp}
+
+  \CommentTok{\# assign each data point to the latent class with the highest relevance (crisp assignment)}
+\NormalTok{  attrib }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{apply}\NormalTok{(relevance, }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(l)\{}\FunctionTok{replace}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,m), }\FunctionTok{which.max}\NormalTok{(l)[}\DecValTok{1}\NormalTok{], }\DecValTok{1}\NormalTok{)\}))}
+  \CommentTok{\# update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class}
+\NormalTok{  param.mean.new }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}\FunctionTok{mean}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR[attrib[,j]}\SpecialCharTok{==}\DecValTok{1}\NormalTok{])\})}
+  \CommentTok{\# update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class}
+\NormalTok{  param.sd.new }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}\FunctionTok{sd}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR[attrib[,j]}\SpecialCharTok{==}\DecValTok{1}\NormalTok{])\}) }
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} Convergence}
+
+  \CommentTok{\# calculate the difference between the new and old mean parameters to check for convergence}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Iteration"}\NormalTok{,itera,}\StringTok{"evolution:"}\NormalTok{,dif }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(}\FunctionTok{abs}\NormalTok{(param.mean.new }\SpecialCharTok{{-}}\NormalTok{ param.mean)), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \CommentTok{\# if the difference is less than the convergence threshold, exit the loop }
+  \ControlFlowTok{if}\NormalTok{ (dif }\SpecialCharTok{\textless{}}\NormalTok{ eps) }\ControlFlowTok{break} 
+\NormalTok{  param.mean }\OtherTok{\textless{}{-}}\NormalTok{ param.mean.new }\CommentTok{\# update the mean parameters for the next iteration}
+\NormalTok{  param.sd }\OtherTok{\textless{}{-}}\NormalTok{ param.sd.new }\CommentTok{\# update the standard deviation parameters for the next iteration}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   mean 1   mean 2 
+## 89.92308 84.50936 
+##     sd 1     sd 2 
+## 6.595841 6.595841 
+## Iteration 0 evolution: 14.10237 
+##   mean 1   mean 2 
+## 97.64969 78.13360 
+##      sd 1      sd 2 
+## 10.396169  6.592481 
+## Iteration 1 evolution: 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Save manual crisp 2{-}class parameters for plotting in parts 4 and 5}
+\NormalTok{manual\_crisp\_mean\_2 }\OtherTok{\textless{}{-}}\NormalTok{ param.mean}
+\NormalTok{manual\_crisp\_sd\_2 }\OtherTok{\textless{}{-}}\NormalTok{ param.sd}
+\NormalTok{manual\_crisp\_classes\_2 }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(attrib, }\DecValTok{1}\NormalTok{, which.max)}
+\NormalTok{manual\_crisp\_props\_2 }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{prop.table}\NormalTok{(}\FunctionTok{table}\NormalTok{(manual\_crisp\_classes\_2)))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{3 latent classes}\label{latent-classes-3}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# iteration 0}
+\NormalTok{m }\OtherTok{\textless{}{-}} \DecValTok{3} \CommentTok{\# number of latent classes}
+\NormalTok{eps }\OtherTok{\textless{}{-}} \FloatTok{0.01} \CommentTok{\# convergence error}
+\NormalTok{itera }\OtherTok{\textless{}{-}} \DecValTok{0} \CommentTok{\# iteration counter}
+\NormalTok{maxitera }\OtherTok{\textless{}{-}} \DecValTok{100} \CommentTok{\# maximum number of iterations}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{523}\NormalTok{) }\CommentTok{\# for reproducibility}
+\NormalTok{param.mean }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, m) }\CommentTok{\# initial mean values for the latent classes, randomly sampled from the data}
+\NormalTok{param.sd }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\FunctionTok{sd}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR) }\SpecialCharTok{/}\NormalTok{ m, m) }\CommentTok{\# initial standard deviation values for the latent classes, set to a fraction of the overall standard deviation of the data}
+
+\ControlFlowTok{for}\NormalTok{ (itera }\ControlFlowTok{in} \DecValTok{0}\SpecialCharTok{:}\NormalTok{maxitera) \{ }\CommentTok{\# EM algorithm loop}
+  \FunctionTok{names}\NormalTok{(param.mean) }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(}\StringTok{"mean"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m) }\CommentTok{\# assign names to the mean parameters for better readability}
+  \FunctionTok{names}\NormalTok{(param.sd) }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(}\StringTok{"sd"}\NormalTok{,}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m) }\CommentTok{\# assign names to the standard deviation parameters for better readability}
+  \FunctionTok{print}\NormalTok{(param.mean) }\CommentTok{\# print the current mean parameters for each latent class}
+  \FunctionTok{print}\NormalTok{(param.sd) }\CommentTok{\# print the current standard deviation parameters for each latent class}
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} E{-}Step}
+
+  \CommentTok{\# data points (mean HR for each subject)}
+\NormalTok{  xx }\OtherTok{\textless{}{-}}\NormalTok{ data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR}
+  \CommentTok{\# calculate the density of each data point under each latent class distribution}
+\NormalTok{  densities }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(i)\{}\FunctionTok{dnorm}\NormalTok{(xx,}\AttributeTok{mean=}\NormalTok{param.mean[i],}\AttributeTok{sd=}\NormalTok{param.sd[i])\})}
+  \CommentTok{\# calculate the relevance (responsibility) of each latent class for each data point by normalizing the densities }
+\NormalTok{  relevance }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{apply}\NormalTok{(densities, }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(l)\{l}\SpecialCharTok{/}\FunctionTok{sum}\NormalTok{(l)\})) }
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} M{-}Step crisp}
+
+  \CommentTok{\# assign each data point to the latent class with the highest relevance (crisp assignment)}
+\NormalTok{  attrib }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{apply}\NormalTok{(relevance, }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(l)\{}\FunctionTok{replace}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,m), }\FunctionTok{which.max}\NormalTok{(l)[}\DecValTok{1}\NormalTok{], }\DecValTok{1}\NormalTok{)\}))}
+  \CommentTok{\# update the mean parameters for each latent class by calculating the average of the data points that are assigned to that class}
+\NormalTok{  param.mean.new }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}\FunctionTok{mean}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR[attrib[,j]}\SpecialCharTok{==}\DecValTok{1}\NormalTok{])\})}
+  \CommentTok{\# update the standard deviation parameters for each latent class by calculating the standard deviation of the data points that are assigned to that class }
+\NormalTok{  param.sd.new }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}\FunctionTok{sd}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR[attrib[,j]}\SpecialCharTok{==}\DecValTok{1}\NormalTok{])\}) }
+
+  \DocumentationTok{\#\# Expectation{-}Maximization {-} Convergence}
+
+  \CommentTok{\# calculate the difference between the new and old mean parameters to check for convergence}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Iteration"}\NormalTok{,itera,}\StringTok{"evolution:"}\NormalTok{,dif }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(}\FunctionTok{abs}\NormalTok{(param.mean.new }\SpecialCharTok{{-}}\NormalTok{ param.mean)), }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \CommentTok{\# if the difference is less than the convergence threshold, exit the loop}
+  \ControlFlowTok{if}\NormalTok{ (dif }\SpecialCharTok{\textless{}}\NormalTok{ eps) }\ControlFlowTok{break} 
+\NormalTok{  param.mean }\OtherTok{\textless{}{-}}\NormalTok{ param.mean.new }\CommentTok{\# update the mean parameters for the next iteration}
+\NormalTok{  param.sd }\OtherTok{\textless{}{-}}\NormalTok{ param.sd.new }\CommentTok{\# update the standard deviation parameters for the next iteration}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    mean 1    mean 2    mean 3 
+##  89.92308  84.50936 110.43659 
+##     sd 1     sd 2     sd 3 
+## 4.397227 4.397227 4.397227 
+## Iteration 0 evolution: 9.053772 
+##    mean 1    mean 2    mean 3 
+##  91.84595  78.13360 111.19173 
+##     sd 1     sd 2     sd 3 
+## 3.221059 6.592481 8.433512 
+## Iteration 1 evolution: 1.529474 
+##    mean 1    mean 2    mean 3 
+##  91.44085  78.13360 110.06736 
+##     sd 1     sd 2     sd 3 
+## 2.700669 6.592481 8.709967 
+## Iteration 2 evolution: 1.434214 
+##    mean 1    mean 2    mean 3 
+##  91.08458  78.13360 108.98942 
+##     sd 1     sd 2     sd 3 
+## 2.240360 6.592481 9.003264 
+## Iteration 3 evolution: 1.342883 
+##    mean 1    mean 2    mean 3 
+##  90.78621  78.13360 107.94491 
+##     sd 1     sd 2     sd 3 
+## 1.877086 6.592481 9.315674 
+## Iteration 4 evolution: 1.240961 
+##    mean 1    mean 2    mean 3 
+##  90.52965  78.13360 106.96050 
+##     sd 1     sd 2     sd 3 
+## 1.576347 6.592481 9.599361 
+## Iteration 5 evolution: 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Save manual crisp 3{-}class parameters for plotting in parts 4 and 5}
+\NormalTok{manual\_crisp\_mean\_3 }\OtherTok{\textless{}{-}}\NormalTok{ param.mean}
+\NormalTok{manual\_crisp\_sd\_3 }\OtherTok{\textless{}{-}}\NormalTok{ param.sd}
+\NormalTok{manual\_crisp\_classes\_3 }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(attrib, }\DecValTok{1}\NormalTok{, which.max)}
+\NormalTok{manual\_crisp\_props\_3 }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{prop.table}\NormalTok{(}\FunctionTok{table}\NormalTok{(manual\_crisp\_classes\_3)))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{- Mclust package-}\label{mclust-package-}
+
+Using Mclust package to fit Gaussian mixture models with 2 and 3 latent
+classes. The \texttt{Mclust} function will automatically select the best
+model based on Bayesian Information Criterion, but we will specify the
+number of classes (G) to fit the models accordingly. We also set
+convergence criteria for the EM algorithm to ensure it runs efficiently.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Set convergence error and maximum number of iterations for EM algorithm}
+\NormalTok{eps }\OtherTok{\textless{}{-}} \FloatTok{0.01}
+\NormalTok{itmax }\OtherTok{\textless{}{-}} \DecValTok{100}
+\CommentTok{\# Apply EM algorithm with 2 latent classes}
+\NormalTok{mclust\_em\_2 }\OtherTok{\textless{}{-}} \FunctionTok{Mclust}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{G =} \DecValTok{2}\NormalTok{, }\AttributeTok{control =} \FunctionTok{emControl}\NormalTok{(}\AttributeTok{eps=}\NormalTok{eps, }\AttributeTok{itmax=}\NormalTok{itmax))}
+\CommentTok{\# Apply EM algorithm with 3 latent classes}
+\NormalTok{mclust\_em\_3 }\OtherTok{\textless{}{-}} \FunctionTok{Mclust}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{G =} \DecValTok{3}\NormalTok{, }\AttributeTok{control =} \FunctionTok{emControl}\NormalTok{(}\AttributeTok{eps=}\NormalTok{eps, }\AttributeTok{itmax=}\NormalTok{itmax))}
+\end{Highlighting}
+\end{Shaded}
+
+\section{4. Plot the densities for each of the latent
+classes.}\label{plot-the-densities-for-each-of-the-latent-classes.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setup parameters}
+
+\CommentTok{\# Define standardised limits and common variables for fair visual comparison across all models}
+\NormalTok{x\_min }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{{-}} \DecValTok{10}
+\NormalTok{x\_max }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{+} \DecValTok{10}
+\NormalTok{xx }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(x\_min, x\_max, }\AttributeTok{by =} \FloatTok{0.1}\NormalTok{)}
+
+\CommentTok{\# Define robust colour palettes}
+\NormalTok{colours\_2 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{, }\StringTok{"darkgreen"}\NormalTok{)}
+\NormalTok{colours\_3 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{, }\StringTok{"darkgreen"}\NormalTok{, }\StringTok{"purple"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{2 latent classes}\label{latent-classes-4}
+
+\paragraph{Soft (manual)}\label{soft-manual}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Soft Manual (2 Classes)"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Mean Heart Rate (bpm)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }
+     \AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) \{}
+  \FunctionTok{lines}\NormalTok{(xx, manual\_soft\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_soft\_mean\_2[i], }\AttributeTok{sd =}\NormalTok{ manual\_soft\_sd\_2[i]), }
+        \AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{total\_density\_soft\_2 }\OtherTok{\textless{}{-}} \FunctionTok{rowSums}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(i) manual\_soft\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_soft\_mean\_2[i], }\AttributeTok{sd =}\NormalTok{ manual\_soft\_sd\_2[i])))}
+\FunctionTok{lines}\NormalTok{(xx, total\_density\_soft\_2, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{c}\NormalTok{(}\StringTok{"Class 1"}\NormalTok{, }\StringTok{"Class 2"}\NormalTok{, }\StringTok{"Total Mixture"}\NormalTok{), }
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(colours\_2, }\StringTok{"black"}\NormalTok{), }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-11-1.pdf}}
+
+\paragraph{Crisp (manual)}\label{crisp-manual}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Crisp Manual (2 Classes)"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Mean Heart Rate (bpm)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }
+     \AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) \{}
+  \FunctionTok{lines}\NormalTok{(xx, manual\_crisp\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_crisp\_mean\_2[i], }\AttributeTok{sd =}\NormalTok{ manual\_crisp\_sd\_2[i]), }
+        \AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{total\_density\_crisp\_2 }\OtherTok{\textless{}{-}} \FunctionTok{rowSums}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(i) manual\_crisp\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_crisp\_mean\_2[i], }\AttributeTok{sd =}\NormalTok{ manual\_crisp\_sd\_2[i])))}
+\FunctionTok{lines}\NormalTok{(xx, total\_density\_crisp\_2, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{c}\NormalTok{(}\StringTok{"Class 1"}\NormalTok{, }\StringTok{"Class 2"}\NormalTok{, }\StringTok{"Total Mixture"}\NormalTok{), }
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(colours\_2, }\StringTok{"black"}\NormalTok{), }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-12-1.pdf}}
+
+\paragraph{Mclust}\label{mclust}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Extract mathematical parameters from the Mclust model}
+\NormalTok{mclust\_means\_2 }\OtherTok{\textless{}{-}}\NormalTok{ mclust\_em\_2}\SpecialCharTok{$}\NormalTok{parameters}\SpecialCharTok{$}\NormalTok{mean}
+\NormalTok{mclust\_sds\_2 }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(mclust\_em\_2}\SpecialCharTok{$}\NormalTok{parameters}\SpecialCharTok{$}\NormalTok{variance}\SpecialCharTok{$}\NormalTok{sigmasq) }
+\NormalTok{mclust\_props\_2 }\OtherTok{\textless{}{-}}\NormalTok{ mclust\_em\_2}\SpecialCharTok{$}\NormalTok{parameters}\SpecialCharTok{$}\NormalTok{pro                  }
+
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Mclust Package (2 Classes)"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Mean Heart Rate (bpm)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }
+     \AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) \{}
+  \FunctionTok{lines}\NormalTok{(xx, mclust\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ mclust\_means\_2[i], }\AttributeTok{sd =}\NormalTok{ mclust\_sds\_2), }
+        \AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{total\_density\_mclust\_2 }\OtherTok{\textless{}{-}} \FunctionTok{rowSums}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(i) mclust\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ mclust\_means\_2[i], }\AttributeTok{sd =}\NormalTok{ mclust\_sds\_2)))}
+\FunctionTok{lines}\NormalTok{(xx, total\_density\_mclust\_2, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{c}\NormalTok{(}\StringTok{"Class 1"}\NormalTok{, }\StringTok{"Class 2"}\NormalTok{, }\StringTok{"Total Mixture"}\NormalTok{), }
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(colours\_2, }\StringTok{"black"}\NormalTok{), }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-13-1.pdf}}
+
+\paragraph{2LM Comparision}\label{lm-comparision}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Set up a Layout Matrix (1 row x 4 columns)}
+\CommentTok{\# The 4th column is dedicated to the legend and made slightly wider (0.6)}
+\NormalTok{layout\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{4}\NormalTok{), }\AttributeTok{nrow =} \DecValTok{1}\NormalTok{)}
+\FunctionTok{layout}\NormalTok{(layout\_matrix, }\AttributeTok{widths =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.6}\NormalTok{))}
+
+\CommentTok{\# Set margins for the main histogram plots}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+
+\CommentTok{\#  Plot 1: Soft Manual (m=2) }
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Soft Manual (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, manual\_soft\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_soft\_mean\_2[i], }\AttributeTok{sd =}\NormalTok{ manual\_soft\_sd\_2[i]), }\AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#  Plot 2: Crisp Manual (m=2) }
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Crisp Manual (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, manual\_crisp\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_crisp\_mean\_2[i], }\AttributeTok{sd =}\NormalTok{ manual\_crisp\_sd\_2[i]), }\AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#  Plot 3: Mclust (m=2) }
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Mclust Package (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, mclust\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ mclust\_means\_2[i], }\AttributeTok{sd =}\NormalTok{ mclust\_sds\_2), }\AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#  Plot 4: LEGEND PANEL }
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)) }\CommentTok{\# Remove all margins so the legend centres perfectly}
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{type =} \StringTok{"n"}\NormalTok{, }\AttributeTok{axes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{xlab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{) }\CommentTok{\# Draw an invisible canvas}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_2, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{title =} \StringTok{"Latent Classes"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-14-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Restore the original graphical layout}
+\FunctionTok{layout}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FloatTok{0.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{3 latent classes}\label{latent-classes-5}
+
+\paragraph{Soft (manual)}\label{soft-manual-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Soft Manual (3 Classes)"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Mean Heart Rate (bpm)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }
+     \AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) \{}
+  \FunctionTok{lines}\NormalTok{(xx, manual\_soft\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_soft\_mean\_3[i], }\AttributeTok{sd =}\NormalTok{ manual\_soft\_sd\_3[i]), }
+        \AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{total\_density\_soft\_3 }\OtherTok{\textless{}{-}} \FunctionTok{rowSums}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(i) manual\_soft\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_soft\_mean\_3[i], }\AttributeTok{sd =}\NormalTok{ manual\_soft\_sd\_3[i])))}
+\FunctionTok{lines}\NormalTok{(xx, total\_density\_soft\_3, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{c}\NormalTok{(}\StringTok{"Class 1"}\NormalTok{, }\StringTok{"Class 2"}\NormalTok{, }\StringTok{"Class 3"}\NormalTok{, }\StringTok{"Total Mixture"}\NormalTok{), }
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(colours\_3, }\StringTok{"black"}\NormalTok{), }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-15-1.pdf}}
+
+\paragraph{Crisp (manual)}\label{crisp-manual-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Crisp Manual (3 Classes)"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Mean Heart Rate (bpm)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }
+     \AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) \{}
+  \FunctionTok{lines}\NormalTok{(xx, manual\_crisp\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_crisp\_mean\_3[i], }\AttributeTok{sd =}\NormalTok{ manual\_crisp\_sd\_3[i]), }
+        \AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{total\_density\_crisp\_3 }\OtherTok{\textless{}{-}} \FunctionTok{rowSums}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(i) manual\_crisp\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_crisp\_mean\_3[i], }\AttributeTok{sd =}\NormalTok{ manual\_crisp\_sd\_3[i])))}
+\FunctionTok{lines}\NormalTok{(xx, total\_density\_crisp\_3, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{c}\NormalTok{(}\StringTok{"Class 1"}\NormalTok{, }\StringTok{"Class 2"}\NormalTok{, }\StringTok{"Class 3"}\NormalTok{, }\StringTok{"Total Mixture"}\NormalTok{), }
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(colours\_3, }\StringTok{"black"}\NormalTok{), }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-16-1.pdf}}
+
+\paragraph{Mclust}\label{mclust-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mclust\_means\_3 }\OtherTok{\textless{}{-}}\NormalTok{ mclust\_em\_3}\SpecialCharTok{$}\NormalTok{parameters}\SpecialCharTok{$}\NormalTok{mean}
+\NormalTok{mclust\_sds\_3 }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(mclust\_em\_3}\SpecialCharTok{$}\NormalTok{parameters}\SpecialCharTok{$}\NormalTok{variance}\SpecialCharTok{$}\NormalTok{sigmasq)}
+\NormalTok{mclust\_props\_3 }\OtherTok{\textless{}{-}}\NormalTok{ mclust\_em\_3}\SpecialCharTok{$}\NormalTok{parameters}\SpecialCharTok{$}\NormalTok{pro}
+
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Mclust Package (3 Classes)"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Mean Heart Rate (bpm)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }
+     \AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) \{}
+  \FunctionTok{lines}\NormalTok{(xx, mclust\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ mclust\_means\_3[i], }\AttributeTok{sd =}\NormalTok{ mclust\_sds\_3), }
+        \AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{total\_density\_mclust\_3 }\OtherTok{\textless{}{-}} \FunctionTok{rowSums}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(i) mclust\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ mclust\_means\_3[i], }\AttributeTok{sd =}\NormalTok{ mclust\_sds\_3)))}
+\FunctionTok{lines}\NormalTok{(xx, total\_density\_mclust\_3, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{c}\NormalTok{(}\StringTok{"Class 1"}\NormalTok{, }\StringTok{"Class 2"}\NormalTok{, }\StringTok{"Class 3"}\NormalTok{, }\StringTok{"Total Mixture"}\NormalTok{), }
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(colours\_3, }\StringTok{"black"}\NormalTok{), }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-17-1.pdf}}
+
+\paragraph{3LM Comparision}\label{lm-comparision-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Set up a Layout Matrix (1 row x 4 columns)}
+\CommentTok{\# The 4th column is dedicated to the legend and made slightly wider (0.6)}
+\NormalTok{layout\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{4}\NormalTok{), }\AttributeTok{nrow =} \DecValTok{1}\NormalTok{)}
+\FunctionTok{layout}\NormalTok{(layout\_matrix, }\AttributeTok{widths =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.6}\NormalTok{))}
+
+\CommentTok{\# Set margins for the main histogram plots}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+
+\CommentTok{\#  Plot 1: Soft Manual }
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Soft Manual (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, manual\_soft\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_soft\_mean\_3[i], }\AttributeTok{sd =}\NormalTok{ manual\_soft\_sd\_3[i]), }\AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#  Plot 2: Crisp Manual }
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Crisp Manual (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, manual\_crisp\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_crisp\_mean\_3[i], }\AttributeTok{sd =}\NormalTok{ manual\_crisp\_sd\_3[i]), }\AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#  Plot 3: Mclust }
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Mclust Package (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, mclust\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ mclust\_means\_3[i], }\AttributeTok{sd =}\NormalTok{ mclust\_sds\_3), }\AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#  Plot 4: LEGEND PANEL }
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)) }\CommentTok{\# Remove all margins so the legend centres perfectly}
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{type =} \StringTok{"n"}\NormalTok{, }\AttributeTok{axes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{xlab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{) }\CommentTok{\# Draw an invisible canvas}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_3, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{title =} \StringTok{"Latent Classes"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-18-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Restore the original graphical layout}
+\FunctionTok{layout}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FloatTok{0.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Global comparision}\label{global-comparision}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Global Comparison (m=2 and m=3 together)}
+
+\CommentTok{\# Set up a Layout Matrix}
+\CommentTok{\# This creates a 2x4 grid. }
+\CommentTok{\# Plots 1, 2, 3 go on the top row. Plots 4, 5, 6 go on the bottom row.}
+\CommentTok{\# Plot 7 (the legend) spans the entire 4th column across both rows.}
+\NormalTok{layout\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{7}\NormalTok{,}
+                          \DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{7}\NormalTok{), }\AttributeTok{nrow =} \DecValTok{2}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# Apply the layout, making the legend column narrower than the plot columns}
+\FunctionTok{layout}\NormalTok{(layout\_matrix, }\AttributeTok{widths =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.6}\NormalTok{))}
+
+\CommentTok{\# Set margins for the main histogram plots}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+
+\CommentTok{\#  ROW 1: 2 CLASSES }
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Soft Manual (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, manual\_soft\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_soft\_mean\_2[i], }\AttributeTok{sd =}\NormalTok{ manual\_soft\_sd\_2[i]), }\AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Crisp Manual (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, manual\_crisp\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_crisp\_mean\_2[i], }\AttributeTok{sd =}\NormalTok{ manual\_crisp\_sd\_2[i]), }\AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Mclust Package (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, mclust\_props\_2[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ mclust\_means\_2[i], }\AttributeTok{sd =}\NormalTok{ mclust\_sds\_2), }\AttributeTok{col =}\NormalTok{ colours\_2[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+
+\CommentTok{\#  ROW 2: 3 CLASSES }
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Soft Manual (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Density"}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, manual\_soft\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_soft\_mean\_3[i], }\AttributeTok{sd =}\NormalTok{ manual\_soft\_sd\_3[i]), }\AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Crisp Manual (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, manual\_crisp\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ manual\_crisp\_mean\_3[i], }\AttributeTok{sd =}\NormalTok{ manual\_crisp\_sd\_3[i]), }\AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =} \StringTok{"lightgray"}\NormalTok{, }\AttributeTok{border =} \StringTok{"white"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Mclust Package (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.08}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(x\_min, x\_max))}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{) }\FunctionTok{lines}\NormalTok{(xx, mclust\_props\_3[i] }\SpecialCharTok{*} \FunctionTok{dnorm}\NormalTok{(xx, }\AttributeTok{mean =}\NormalTok{ mclust\_means\_3[i], }\AttributeTok{sd =}\NormalTok{ mclust\_sds\_3), }\AttributeTok{col =}\NormalTok{ colours\_3[i], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+
+\CommentTok{\#  LEGEND PANEL (Plot 7) }
+\CommentTok{\# Remove all margins so the legend is centred perfectly in its dedicated space}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{))}
+
+\CommentTok{\# Draw an empty, invisible plot to act as a canvas for the legend}
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{type =} \StringTok{"n"}\NormalTok{, }\AttributeTok{axes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{xlab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{)}
+
+\CommentTok{\# Draw the legend in the centre of this new empty panel}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_3, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{title =} \StringTok{"Latent Classes"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-19-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Restore the original graphical layout so future plots are not affected}
+\FunctionTok{layout}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FloatTok{0.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{5. Plot the mean HR as a function of each subject's age in
+which each point has a color corresponding to the class to which it
+belongs}\label{plot-the-mean-hr-as-a-function-of-each-subjects-age-in-which-each-point-has-a-color-corresponding-to-the-class-to-which-it-belongs}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setup parameters}
+\CommentTok{\# Lock Y{-}axis limits for fair visual comparison across all scatter plots}
+\NormalTok{y\_limits }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FunctionTok{min}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{{-}} \DecValTok{5}\NormalTok{, }
+              \FunctionTok{max}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{+} \DecValTok{5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{2 latent classes}\label{latent-classes-6}
+
+\paragraph{Soft (manual)}\label{soft-manual-2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_2[manual\_soft\_classes\_2], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Soft Manual (2 Classes)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_2, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{title =} \StringTok{"Classification"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-21-1.pdf}}
+
+\paragraph{Crisp (manual)}\label{crisp-manual-2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_2[manual\_crisp\_classes\_2], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Crisp Manual (2 Classes)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_2, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{title =} \StringTok{"Classification"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-22-1.pdf}}
+
+\paragraph{Mclust}\label{mclust-2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_2[mclust\_em\_2}\SpecialCharTok{$}\NormalTok{classification], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Mclust Package (2 Classes)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_2, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{title =} \StringTok{"Classification"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-23-1.pdf}}
+
+\paragraph{2LM Comparision}\label{lm-comparision-2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Set up a Layout Matrix (3 rows x 2 columns)}
+\CommentTok{\# The first column contains plots 1, 2, and 3 stacked vertically.}
+\CommentTok{\# The second column merges to contain plot 4 (the legend) across all rows.}
+\NormalTok{layout\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{,}
+                          \DecValTok{2}\NormalTok{, }\DecValTok{4}\NormalTok{,}
+                          \DecValTok{3}\NormalTok{, }\DecValTok{4}\NormalTok{), }\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# Apply the layout. The plot column gets full width (1), the legend column is narrower (0.3)}
+\FunctionTok{layout}\NormalTok{(layout\_matrix, }\AttributeTok{widths =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\FloatTok{0.3}\NormalTok{))}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+
+\CommentTok{\# Plot 1: Soft Manual (m=2) }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_2[manual\_soft\_classes\_2], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Soft Manual (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\CommentTok{\# Plot 2: Crisp Manual (m=2) }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_2[manual\_crisp\_classes\_2], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Crisp Manual (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\CommentTok{\# Plot 3: Mclust (m=2) }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_2[mclust\_em\_2}\SpecialCharTok{$}\NormalTok{classification], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Mclust Package (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\CommentTok{\# Plot 4: LEGEND PANEL }
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)) }
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{type =} \StringTok{"n"}\NormalTok{, }\AttributeTok{axes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{xlab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{) }
+\FunctionTok{legend}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_2, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{title =} \StringTok{"Latent Classes"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-24-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Restore the original graphical parameters}
+\FunctionTok{layout}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FloatTok{0.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{3 latent classes}\label{latent-classes-7}
+
+\paragraph{Soft (manual)}\label{soft-manual-3}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_3[manual\_soft\_classes\_3], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Soft Manual (3 Classes)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_3, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{title =} \StringTok{"Classification"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-25-1.pdf}}
+
+\paragraph{Crisp (manual)}\label{crisp-manual-3}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_3[manual\_crisp\_classes\_3], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Crisp Manual (3 Classes)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_3, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{title =} \StringTok{"Classification"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-26-1.pdf}}
+
+\paragraph{Mclust}\label{mclust-3}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_3[mclust\_em\_3}\SpecialCharTok{$}\NormalTok{classification], }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{,}
+     \AttributeTok{main =} \StringTok{"Mclust Package (3 Classes)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"topright"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_3, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{title =} \StringTok{"Classification"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-27-1.pdf}}
+
+\paragraph{3LM Comparision}\label{lm-comparision-3}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Set up a Layout Matrix (3 rows x 2 columns)}
+\CommentTok{\# The first column contains the three plots (1, 2, 3)}
+\CommentTok{\# The second column contains the legend (4) spanning all three rows}
+\NormalTok{layout\_matrix\_3 }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{,}
+                            \DecValTok{2}\NormalTok{, }\DecValTok{4}\NormalTok{,}
+                            \DecValTok{3}\NormalTok{, }\DecValTok{4}\NormalTok{), }\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# Apply layout: Main plots get width 1, legend column gets 0.3}
+\FunctionTok{layout}\NormalTok{(layout\_matrix\_3, }\AttributeTok{widths =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\FloatTok{0.3}\NormalTok{))}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+
+\CommentTok{\# Plot 1: Soft Manual (m=3) }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_3[manual\_soft\_classes\_3], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }
+     \AttributeTok{main =} \StringTok{"Soft Manual (m=3)"}\NormalTok{, }
+     \AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\CommentTok{\# Plot 2: Crisp Manual (m=3) }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_3[manual\_crisp\_classes\_3], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }
+     \AttributeTok{main =} \StringTok{"Crisp Manual (m=3)"}\NormalTok{, }
+     \AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\CommentTok{\# Plot 3: Mclust Package (m=3) }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }
+     \AttributeTok{col =}\NormalTok{ colours\_3[mclust\_em\_3}\SpecialCharTok{$}\NormalTok{classification], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }
+     \AttributeTok{main =} \StringTok{"Mclust Package (m=3)"}\NormalTok{, }
+     \AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR (bpm)"}\NormalTok{, }
+     \AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\CommentTok{\# Plot 4: LEGEND PANEL }
+\CommentTok{\# Remove margins for the dedicated legend column}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)) }
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{type =} \StringTok{"n"}\NormalTok{, }\AttributeTok{axes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{xlab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{) }
+
+\CommentTok{\# Centre the legend vertically relative to the three plots}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{), }
+       \AttributeTok{col =}\NormalTok{ colours\_3, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.5}\NormalTok{, }
+       \AttributeTok{title =} \StringTok{"Latent Classes"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-28-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Reset layout and margins for the rest of the document}
+\FunctionTok{layout}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FloatTok{0.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Global Comparision}\label{global-comparision-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Global Comparison Scatter Plots {-} Vertical Matrix Layout}
+\CommentTok{\# Create a 3x3 layout matrix:}
+\CommentTok{\# Col 1: m=2 models | Col 2: m=3 models | Col 3: Shared Legend}
+\NormalTok{layout\_matrix\_global }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{7}\NormalTok{,}
+                                 \DecValTok{3}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{7}\NormalTok{,}
+                                 \DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{7}\NormalTok{), }\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{byrow =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# Apply layout: Plots get equal width (1), legend column is narrower (0.4)}
+\FunctionTok{layout}\NormalTok{(layout\_matrix\_global, }\AttributeTok{widths =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.4}\NormalTok{))}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+
+\CommentTok{\# ROW 1: SOFT MANUAL }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_2[manual\_soft\_classes\_2], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Soft Manual (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_3[manual\_soft\_classes\_3], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Soft Manual (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+
+\CommentTok{\# ROW 2: CRISP MANUAL }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_2[manual\_crisp\_classes\_2], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Crisp Manual (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_3[manual\_crisp\_classes\_3], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Crisp Manual (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+
+\CommentTok{\# ROW 3: MCLUST PACKAGE }
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_2[mclust\_em\_2}\SpecialCharTok{$}\NormalTok{classification], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Mclust Package (m=2)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean HR"}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+\FunctionTok{plot}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{age, data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{col =}\NormalTok{ colours\_3[mclust\_em\_3}\SpecialCharTok{$}\NormalTok{classification], }
+     \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{, }\AttributeTok{main =} \StringTok{"Mclust Package (m=3)"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylim =}\NormalTok{ y\_limits)}
+
+
+\CommentTok{\# SHARED LEGEND PANEL (Plot 7) }
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{type =} \StringTok{"n"}\NormalTok{, }\AttributeTok{axes =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{xlab =} \StringTok{""}\NormalTok{, }\AttributeTok{ylab =} \StringTok{""}\NormalTok{)}
+\CommentTok{\# Centred legend explaining the 3{-}class colour scheme used across the matrix}
+\FunctionTok{legend}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\AttributeTok{legend =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Class"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{), }\AttributeTok{col =}\NormalTok{ colours\_3, }
+       \AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{title =} \StringTok{"Latent Classes"}\NormalTok{, }\AttributeTok{bty =} \StringTok{"n"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-29-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Restore original settings}
+\FunctionTok{layout}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FloatTok{0.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{6. Generate 1000 data points at random according to a single
+distribution fitted to the original
+data.}\label{generate-1000-data-points-at-random-according-to-a-single-distribution-fitted-to-the-original-data.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# Random Sample Generation}
+
+\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{1000}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{523}\NormalTok{)}
+\NormalTok{sample.simple }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(n, }\AttributeTok{mean=}\FunctionTok{mean}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR), }\AttributeTok{sd=}\FunctionTok{sd}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR))}
+
+
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{mar=}\FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{))}
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{main=}\StringTok{"Observed data"}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"Mean Heart Rate"}\NormalTok{, }\AttributeTok{freq=}\NormalTok{F, }\AttributeTok{breaks =} \DecValTok{7}\NormalTok{, }\AttributeTok{col=}\StringTok{"lightgray"}\NormalTok{, }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{40}\NormalTok{,}\DecValTok{140}\NormalTok{), }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.05}\NormalTok{))}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{density}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR), }\AttributeTok{col=}\DecValTok{2}\NormalTok{, }\AttributeTok{lwd=}\DecValTok{2}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(sample.simple,  }\AttributeTok{main=}\StringTok{"1000 Generated data points from a single distribution"}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"Mean Heart Rate"}\NormalTok{, }\AttributeTok{freq=}\NormalTok{F, }\AttributeTok{breaks=}\DecValTok{7}\NormalTok{, }\AttributeTok{col=}\StringTok{"lightgray"}\NormalTok{,}\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{40}\NormalTok{,}\DecValTok{140}\NormalTok{), }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.05}\NormalTok{))}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{density}\NormalTok{(sample.simple), }\AttributeTok{col=}\StringTok{"darkblue"}\NormalTok{, }\AttributeTok{lwd=}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-30-1.pdf}}
+
+\section{7. Generate 1000 data points at random according to a mixture
+of distributions fitted using one of the previous EM computed in
+3.}\label{generate-1000-data-points-at-random-according-to-a-mixture-of-distributions-fitted-using-one-of-the-previous-em-computed-in-3.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{1000}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{523}\NormalTok{)}
+\NormalTok{m }\OtherTok{\textless{}{-}} \DecValTok{2}
+\NormalTok{sample.classes }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\AttributeTok{size=}\NormalTok{n, }\AttributeTok{replace=}\NormalTok{T, }\AttributeTok{prob=}\NormalTok{manual\_crisp\_props\_2)}
+\NormalTok{sample.prop }\OtherTok{\textless{}{-}} \FunctionTok{prop.table}\NormalTok{(}\FunctionTok{table}\NormalTok{(sample.classes))}
+\NormalTok{sample.values }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\FunctionTok{unlist}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{m, }\ControlFlowTok{function}\NormalTok{(j)\{}
+  \FunctionTok{rnorm}\NormalTok{(n}\SpecialCharTok{*}\NormalTok{sample.prop[j], }\AttributeTok{mean=}\NormalTok{manual\_crisp\_mean\_2[j], }\AttributeTok{sd=}\NormalTok{manual\_crisp\_sd\_2[j])}
+\NormalTok{\})), }\DecValTok{0}\NormalTok{)}
+
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), }\AttributeTok{mar=}\FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{))}
+\FunctionTok{hist}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR, }\AttributeTok{main=}\StringTok{"Observed data"}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"Mean Heart Rate"}\NormalTok{, }\AttributeTok{freq=}\NormalTok{F, }\AttributeTok{breaks =} \DecValTok{7}\NormalTok{, }\AttributeTok{col=}\StringTok{"lightgray"}\NormalTok{, }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{40}\NormalTok{,}\DecValTok{140}\NormalTok{), }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.05}\NormalTok{))}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{density}\NormalTok{(data\_summary}\SpecialCharTok{$}\NormalTok{mean\_HR), }\AttributeTok{col=}\DecValTok{2}\NormalTok{, }\AttributeTok{lwd=}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#Manual Crisp 2 classes was chosen for the EM sample generation as it had the best visual fit to the observed data in the previous plots}
+
+\FunctionTok{hist}\NormalTok{(sample.values,  }\AttributeTok{main=}\FunctionTok{paste}\NormalTok{(}\StringTok{"1000 EM generated data points (m = 2)"}\NormalTok{), }\AttributeTok{xlab=}\StringTok{"Mean Heart Rate"}\NormalTok{, }\AttributeTok{freq=}\NormalTok{F, }\AttributeTok{breaks =} \DecValTok{7}\NormalTok{, }\AttributeTok{col=}\StringTok{"lightgray"}\NormalTok{,}\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{40}\NormalTok{,}\DecValTok{140}\NormalTok{), }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.05}\NormalTok{))}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{density}\NormalTok{(sample.values), }\AttributeTok{col=}\StringTok{"darkblue"}\NormalTok{, }\AttributeTok{lwd=}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Assignment_2_files/figure-latex/unnamed-chunk-31-1.pdf}}
+
+\end{document}
