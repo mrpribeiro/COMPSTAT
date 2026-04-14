@@ -157,6 +157,163 @@ round(prop.table(table(cohort$Gender, cohort$SmokingStatus), margin = 1) * 100, 
 
 # Block 2: Risk Combination and Conversion to Annual Rates
 
+Since the provided risks are cumulative over 5 or 10 years, we need to convert them into annual transition probabilities. We will use the formula for converting cumulative probability to a rate, and then back to an annual probability. This process is done separately for disease risk and death risk, based on the relevant risk factors. The assumption of independence allows us to simply sum the rates for each risk factor to get a total rate for each individual, which we then convert back to an annual probability.
+
+## Disease Risk
+
+```{r}
+# Function to convert probability to rate
+prob_to_rate <- function(p, t) { -log(1 - p) / t }
+
+# Convert 5-year probabilities to rates for each risk factor
+r_smoker <- prob_to_rate(0.503, 5)
+r_non_smoker <- prob_to_rate(0.054, 5)
+r_old <- prob_to_rate(0.221, 5)
+r_young <- prob_to_rate(0.132, 5)
+
+# Convert rates back to yearly probabilities
+cohort$YearlyRisk_Disease_Smoker <- 1 - exp(-r_smoker * 1)
+cohort$YearlyRisk_Disease_NonSmoker <- 1 - exp(-r_non_smoker * 1)
+cohort$YearlyRisk_Disease_Old <- 1 - exp(-r_old * 1)
+cohort$YearlyRisk_Disease_Young <- 1 - exp(-r_young * 1)
+```
+
+## Death Risk
+
+```{r}
+# Convert 10-year probabilities to rates for each risk factor
+r_old_death <- prob_to_rate(0.229, 10)
+r_young_death <- prob_to_rate(0.010, 10)
+r_male_death <- prob_to_rate(0.123, 10)
+r_female_death <- prob_to_rate(0.106, 10)
+
+# Convert total rates back to yearly probabilities
+cohort$YearlyRisk_Death_Old <- 1 - exp(-r_old_death * 1)
+cohort$YearlyRisk_Death_Young <- 1 - exp(-r_young_death * 1)
+cohort$YearlyRisk_Death_Male <- 1 - exp(-r_male_death * 1)
+cohort$YearlyRisk_Death_Female <- 1 - exp(-r_female_death * 1)
+```
+
+## Total Risk Calculation
+
+To check the answers obtained in the simulation we can calculate the total risk of disease in 10 years for the population and use it and the 10-year risk of any-cause mortality as a benchmark.
+
+```{r}
+# Convert 5-year probability of risk of disse to rate
+r_disease <- prob_to_rate(0.176, 5)
+
+# Convert year rates back to 10-year probability
+total_risk_disease <- 1 - exp(-r_disease * 10)
+
+# Calculate how many of the patients developed the disease after 10 years.
+num_disease <- round(total_risk_disease * N)
+num_disease
+
+# Calculate how many of the patients died after 10 years.
+total_risk_death <- 0.115
+num_death <- round(total_risk_death * N)
+num_death
+```
+
+Based on the cumulative probabilities, the answers are the following:
+
+1.  How many of the patients developed the disease after 10 years?
+
+After 10 years the number of patients that developed the disease is `r num_disease`.
+
+2.  How many of the patients died after 10 years?
+
+After 10 years the number of patients that died is `r num_death`.
+
 # Block 3: Markov Chain and Results Analysis
 
+```{r}
+
+# 1. MORTALITY
+cohort$r_death <- (ifelse(cohort$AgeGroup == ">= 50", 
+                        r_old_death, 
+                        r_young_death)
+                        +
+                  ifelse(cohort$Gender == "Male",
+                        r_male_death,
+                        r_female_death))
+
+# Convert total death rate back to annual probability
+cohort$p_death_annual <- 1 - exp(-cohort$r_death)
+
+
+# 2. DISEASE
+cohort$r_disease <- (ifelse(cohort$SmokingStatus == "Smoker", 
+                            r_smoker, 
+                            r_non_smoker)
+                            +
+                     ifelse(cohort$Gender == "Male",
+                        r_male_death,
+                        r_female_death))
+
+# Convert total disease rate back to annual probability
+cohort$p_disease_annual <- 1 - exp(-cohort$r_disease)
+```
+
+```{r}
+# Markov Simulation
+
+# 1. Initialization of the population state
+# All 100,000 subjects start in the "Healthy" state
+n_subjects <- nrow(cohort)
+status <- rep("Healthy", n_subjects)
+
+# 2. Iterative Markov Loop (Year 1 to 10)
+for (yr in 1:10) {
+  
+  # Step A: Identify subjects eligible for mortality (anyone not already dead)
+  # In a Markov model, the transition depends on the current state
+  alive_idx <- which(status != "Dead")
+  
+  # Step B: Simulate Mortality (Transition to 'Dead' state)
+  # Generate a random number [0,1] for each alive subject
+  death_random_draw <- runif(length(alive_idx))
+  
+  # If the random draw is less than the specific annual risk, the subject dies
+  died_this_year <- death_random_draw < cohort$p_death_annual[alive_idx]
+  
+  # Update the status of those who transitioned to the absorbing state "Dead"
+  status[alive_idx[died_this_year]] <- "Dead"
+  
+  
+  # Step C: Simulate Disease (Transition to 'Ill' state)
+  # Only those who are "Healthy" AND survived the mortality check can transition
+  # This handles the competing risk: death "wins" over disease if both occur
+  healthy_survivors_idx <- which(status == "Healthy")
+  
+  disease_random_draw <- runif(length(healthy_survivors_idx))
+  
+  # If the draw is less than the risk, the subject moves from Healthy -> Ill
+  developed_disease_this_year <- disease_random_draw < cohort$p_disease_annual[healthy_survivors_idx]
+  
+  # Update the status to "Ill"
+  status[healthy_survivors_idx[developed_disease_this_year]] <- "Ill"
+}
+
+# 3. Final Outcome Extraction
+# Count final states after 10 years
+final_deaths <- sum(status == "Dead")
+final_disease_cases <- sum(status == "Ill")
+
+# Output the results for validation
+cat("Simulation Results after 10 years:\n")
+cat("- Total Patients who Died:", final_deaths, "\n")
+cat("- Total Patients who Developed Disease (and stayed alive):", final_disease_cases, "\n")
+```
+
+
 # Conclusions
+
+
+```{r}
+# The discrepancy between the simulated results and the expected values based on cumulative probabilities can be attributed to several factors:
+# 1. Stochastic Variability: Monte Carlo simulations inherently involve randomness. Even with a large sample size of 100,000, there can be variability in the outcomes due to chance. Running multiple iterations of the simulation and averaging results can help mitigate this.
+# 2. Independence Assumption: The assumption that risk factors are independent may not hold true in real-world scenarios. If there are interactions between risk factors (e.g., smoking and age), the combined effect on disease and mortality risk may differ from the simple additive model used in the simulation.
+# 3. Transition Probability Estimation: The conversion of cumulative probabilities to annual rates and back to probabilities may introduce approximation errors, especially if the underlying risk does not follow a simple exponential distribution. The actual risk over time may be more complex than the model assumes. 
+
+```
