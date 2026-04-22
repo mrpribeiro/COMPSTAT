@@ -41,7 +41,7 @@ Using all the files available in <https://physionet.org/content/bidmc/1.0.0/>:
 
 The submitted code file should include **comments** to improve readability.
 
-[[Notes:\\\\](Notes:){.uri}](%5BNotes:%5D(Notes:)%7B.uri%7D){.uri} - the filenames vary between bidmc_01 to bidmc_53\
+[\[Notes:\\\\\](Notes:){.uri}](%5BNotes:%5D(Notes:)%7B.uri%7D){.uri} - the filenames vary between bidmc_01 to bidmc_53\
 - the **bidmc_XX_Numerics.csv** contains four columns with the physiological parameters, such as the heart rate (**HR**), respiratory rate (RESP), and blood oxygen saturation level (SpO2). These are sampled at 1 Hz.\
 - the **bidmc_XX_Fix.txt** contains the values of Fixed variables, such as **age** and gender.\
 - the link to download the files are in the following format:\
