@@ -65,12 +65,11 @@ Based on the simulation, answer the following:
 
 # Block 1: Initial Cohort Generation
 
-The foundation of our model requires generating a baseline population of 100,000 individuals (Time 0). To ensure the strict reproducibility required by Monte Carlo simulations, we begin by defining a fixed seed.
-We generate the independent demographic variables (Gender and Age Group) using simple sampling with replacement, adhering to the marginal probabilities provided in the assignment (48% male; 45% aged 50 or older).
+The foundation of our model requires generating a baseline population of 100,000 individuals (Time 0). To ensure the strict reproducibility required by Monte Carlo simulations, we begin by defining a fixed seed. We generate the independent demographic variables (Gender and Age Group) using simple sampling with replacement, adhering to the marginal probabilities provided in the assignment (48% male; 45% aged 50 or older).
 
 ```{r}
 
-# Reprodutibility and sample size
+# Reproducibility and sample size
 set.seed(9) 
 N <- 100000
 
@@ -131,10 +130,6 @@ cohort <- data.frame(
   AgeGroup = factor(pop_age, levels = c("<50", ">=50")),
   SmokingStatus = factor(pop_smoke, levels = c("Non-Smoker", "Smoker"))
 )
-
-# Added already required blank columns to be filled later
-cohort$YearlyRisk_Disease <- NA
-cohort$YearlyRisk_Death <- NA
 
 # View dataframe
 cohort
