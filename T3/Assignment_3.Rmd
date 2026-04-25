@@ -286,6 +286,7 @@ library(gganimate)
 library(dplyr)
 
 # Markov Simulation with state tracking
+set.seed(9)
 n_subjects <- nrow(cohort)
 status <- rep("Healthy", n_subjects)
 
