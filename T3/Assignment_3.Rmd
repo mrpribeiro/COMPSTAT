@@ -228,6 +228,8 @@ The risk most be compounded annually, meaning that the transition probabilities 
 
 ```{r}
 # Markov Simulation
+# Reproducibility and sample size
+set.seed(9) 
 n_subjects <- nrow(cohort)
 status <- rep("Healthy", n_subjects)
  
@@ -242,7 +244,7 @@ for (yr in 1:10) {
     become_ill_by_smoke <- disease_draw_smoker < ifelse(cohort$SmokingStatus[healthy_idx] == "Smoker",
                                                       cohort$YearlyRisk_Disease_Smoker[healthy_idx],
                                                       cohort$YearlyRisk_Disease_NonSmoker[healthy_idx])
-    become_ill_by_age <- disease_draw_age < ifelse(cohort$AgeGroup[healthy_idx] == ">= 50",
+    become_ill_by_age <- disease_draw_age < ifelse(cohort$AgeGroup[healthy_idx] == ">=50",
                                                       cohort$YearlyRisk_Disease_Old[healthy_idx],
                                                       cohort$YearlyRisk_Disease_Young[healthy_idx])
     became_ill <- become_ill_by_smoke | become_ill_by_age
@@ -254,7 +256,7 @@ for (yr in 1:10) {
   if (length(ill_idx) > 0) {
     draw_age <- runif(length(ill_idx))
     draw_sex <- runif(length(ill_idx))
-    die_by_age <- draw_age < ifelse(cohort$AgeGroup[ill_idx] == ">= 50", 
+    die_by_age <- draw_age < ifelse(cohort$AgeGroup[ill_idx] == ">=50", 
                                     cohort$YearlyRisk_Death_Old[ill_idx], 
                                     cohort$YearlyRisk_Death_Young[ill_idx])
     die_by_sex <- draw_sex < ifelse(cohort$Gender[ill_idx] == "Male",
@@ -350,7 +352,6 @@ p <- ggplot(animation_data_summary, aes(x = Year, y = Count, fill = Status)) +
 # Animate the plot
 animation <- p + transition_time(Year) + ease_aes('linear')
 animate(animation, nframes = 100, fps = 10)
-
 
 ```
 
