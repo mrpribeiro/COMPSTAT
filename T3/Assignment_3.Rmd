@@ -60,7 +60,9 @@ Based on the simulation, answer the following:
 ## Load packages
 
 ```{r, echo=FALSE}
-
+library(ggplot2)
+library(gganimate)
+library(dplyr)
 ```
 
 # Block 1: Initial Cohort Generation
@@ -161,33 +163,85 @@ Since the provided risks are cumulative over 5 or 10 years, we need to convert t
 prob_to_rate <- function(p, t) { -log(1 - p) / t }
 
 # Convert 5-year probabilities to rates for each risk factor
+r_baseline_disease <- prob_to_rate(0.176, 5)
 r_smoker <- prob_to_rate(0.503, 5)
 r_non_smoker <- prob_to_rate(0.054, 5)
 r_old <- prob_to_rate(0.221, 5)
 r_young <- prob_to_rate(0.132, 5)
 
 # Convert rates back to yearly probabilities
-cohort$YearlyRisk_Disease_Smoker <- 1 - exp(-r_smoker * 1)
-cohort$YearlyRisk_Disease_NonSmoker <- 1 - exp(-r_non_smoker * 1)
-cohort$YearlyRisk_Disease_Old <- 1 - exp(-r_old * 1)
-cohort$YearlyRisk_Disease_Young <- 1 - exp(-r_young * 1)
+YearlyRisk_Disease_Baseline <- 1 - exp(-r_baseline_disease * 1)
+YearlyRisk_Disease_Smoker <- 1 - exp(-r_smoker * 1)
+YearlyRisk_Disease_NonSmoker <- 1 - exp(-r_non_smoker * 1)
+YearlyRisk_Disease_Old <- 1 - exp(-r_old * 1)
+YearlyRisk_Disease_Young <- 1 - exp(-r_young * 1)
 ```
 
 ## Death Risk
 
 ```{r}
 # Convert 10-year probabilities to rates for each risk factor
+r_baseline_death <- prob_to_rate(0.115, 10)
 r_old_death <- prob_to_rate(0.229, 10)
 r_young_death <- prob_to_rate(0.010, 10)
 r_male_death <- prob_to_rate(0.123, 10)
 r_female_death <- prob_to_rate(0.106, 10)
 
 # Convert total rates back to yearly probabilities
-cohort$YearlyRisk_Death_Old <- 1 - exp(-r_old_death * 1)
-cohort$YearlyRisk_Death_Young <- 1 - exp(-r_young_death * 1)
-cohort$YearlyRisk_Death_Male <- 1 - exp(-r_male_death * 1)
-cohort$YearlyRisk_Death_Female <- 1 - exp(-r_female_death * 1)
+YearlyRisk_Death_Baseline <- 1 - exp(-r_baseline_death * 1)
+YearlyRisk_Death_Old <- 1 - exp(-r_old_death * 1)
+YearlyRisk_Death_Young <- 1 - exp(-r_young_death * 1)
+YearlyRisk_Death_Male <- 1 - exp(-r_male_death * 1)
+YearlyRisk_Death_Female <- 1 - exp(-r_female_death * 1)
 ```
+
+## Yearly risk of death and disease
+
+As the factors are independent, an individual’s risk is not simply the risk associated with their gender or their age alone, but rather the combination of both relative to the baseline risk. The classic way of calculating this in simple epidemiological simulations is using the Relative Risk (RR) relative to the baseline. To calculate the combined individual risk, the final risk for a specific individual is the baseline risk * RR for gender * RR for age.
+
+-   **5-year risk of disease:** 17.6%
+
+    -   50.3% if a smoker \| 5.4% if a non-smoker
+
+    -   22.1% if ≥50 years old \| 13.2% if \<50 years old
+
+-   **10-year risk of any-cause mortality:** 11.5%
+
+    -   22.9% if ≥50 years old \| 1.0% if \<50 years old
+
+    -   12.3% if male \| 10.6% if female
+
+```{r}
+# Calculate the relative risk for age and gender
+Relative_risk_Death_Old <- 22.9 / 11.5
+Relative_risk_Death_Young <- 1/11.5
+Relative_risk_Death_Male <- 12.3/11.5
+Relative_risk_Death_Female <- 10.6/11.5
+
+# Calculate yearly risk of death for each patient (baseline risk * RR for gender * RR for age)
+cohort$Yearly_risk_death <- YearlyRisk_Death_Baseline * ifelse(cohort$AgeGroup == ">=50", Relative_risk_Death_Old, Relative_risk_Death_Young) *
+  ifelse(cohort$Gender == "Male", Relative_risk_Death_Male, Relative_risk_Death_Female)
+```
+
+```{r}
+# Calculate the relative risk for age and smoking status for disease
+Relative_risk_Disease_Smoker <- 50.3 / 17.6
+Relative_risk_Disease_NonSmoker <- 5.4 / 17.6
+Relative_risk_Disease_Old <- 22.1 / 17.6
+Relative_risk_Disease_Young <- 13.2 / 17.6
+
+# Calculate yearly risk of disease for each patient (baseline risk * RR for smoking status * RR for age)
+cohort$Yearly_risk_disease <- YearlyRisk_Disease_Baseline * ifelse(cohort$SmokingStatus == "Smoker", Relative_risk_Disease_Smoker, Relative_risk_Disease_NonSmoker) *
+  ifelse(cohort$AgeGroup == ">=50", Relative_risk_Disease_Old, Relative_risk_Disease_Young)
+```
+
+## Dataframe with all the required columns
+
+```{r}
+# Final dataframe with all required columns
+cohort
+```
+
 
 ## Total Risk Calculation
 
@@ -242,11 +296,11 @@ for (yr in 1:10) {
     disease_draw_smoker <- runif(length(healthy_idx))
     disease_draw_age <- runif(length(healthy_idx))
     become_ill_by_smoke <- disease_draw_smoker < ifelse(cohort$SmokingStatus[healthy_idx] == "Smoker",
-                                                      cohort$YearlyRisk_Disease_Smoker[healthy_idx],
-                                                      cohort$YearlyRisk_Disease_NonSmoker[healthy_idx])
-    become_ill_by_age <- disease_draw_age < ifelse(cohort$AgeGroup[healthy_idx] == ">=50",
-                                                      cohort$YearlyRisk_Disease_Old[healthy_idx],
-                                                      cohort$YearlyRisk_Disease_Young[healthy_idx])
+                                                      YearlyRisk_Disease_Smoker,
+                                                      YearlyRisk_Disease_NonSmoker)
+    become_ill_by_age <- disease_draw_age < ifelse(cohort$AgeGroup[healthy_idx] == ">= 50",
+                                                      YearlyRisk_Disease_Old,
+                                                      YearlyRisk_Disease_Young)
     became_ill <- become_ill_by_smoke | become_ill_by_age
     status[healthy_idx[became_ill]] <- "Ill"
   }
@@ -256,12 +310,12 @@ for (yr in 1:10) {
   if (length(ill_idx) > 0) {
     draw_age <- runif(length(ill_idx))
     draw_sex <- runif(length(ill_idx))
-    die_by_age <- draw_age < ifelse(cohort$AgeGroup[ill_idx] == ">=50", 
-                                    cohort$YearlyRisk_Death_Old[ill_idx], 
-                                    cohort$YearlyRisk_Death_Young[ill_idx])
+    die_by_age <- draw_age < ifelse(cohort$AgeGroup[ill_idx] == ">= 50", 
+                                    YearlyRisk_Death_Old, 
+                                    YearlyRisk_Death_Young)
     die_by_sex <- draw_sex < ifelse(cohort$Gender[ill_idx] == "Male",
-                                    cohort$YearlyRisk_Death_Male[ill_idx],
-                                    cohort$YearlyRisk_Death_Female[ill_idx])
+                                    YearlyRisk_Death_Male,
+                                    YearlyRisk_Death_Female)
     died <- die_by_age | die_by_sex
     status[ill_idx[died]] <- "Dead"
   }
@@ -281,9 +335,6 @@ Creation of a GIF to illustrate the Markov process:
 
 ```{r, echo=FALSE, warning=FALSE}
 # Create the plot
-library(ggplot2)
-library(gganimate)
-library(dplyr)
 
 # Markov Simulation with state tracking
 set.seed(9)
@@ -302,11 +353,11 @@ for (yr in 1:10) {
     disease_draw_smoker <- runif(length(healthy_idx))
     disease_draw_age <- runif(length(healthy_idx))
     become_ill_by_smoke <- disease_draw_smoker < ifelse(cohort$SmokingStatus[healthy_idx] == "Smoker",
-                                                      cohort$YearlyRisk_Disease_Smoker[healthy_idx],
-                                                      cohort$YearlyRisk_Disease_NonSmoker[healthy_idx])
+                                                      YearlyRisk_Disease_Smoker,
+                                                      YearlyRisk_Disease_NonSmoker)
     become_ill_by_age <- disease_draw_age < ifelse(cohort$AgeGroup[healthy_idx] == ">=50",
-                                                      cohort$YearlyRisk_Disease_Old[healthy_idx],
-                                                      cohort$YearlyRisk_Disease_Young[healthy_idx])
+                                                      YearlyRisk_Disease_Old,
+                                                      YearlyRisk_Disease_Young)
     became_ill <- become_ill_by_smoke | become_ill_by_age
     status[healthy_idx[became_ill]] <- "Ill"
   }
@@ -317,11 +368,11 @@ for (yr in 1:10) {
     draw_age <- runif(length(alive_idx))
     draw_sex <- runif(length(alive_idx))
     die_by_age <- draw_age < ifelse(cohort$AgeGroup[alive_idx] == ">=50", 
-                                    cohort$YearlyRisk_Death_Old[alive_idx], 
-                                    cohort$YearlyRisk_Death_Young[alive_idx])
+                                    YearlyRisk_Death_Old, 
+                                    YearlyRisk_Death_Young)
     die_by_sex <- draw_sex < ifelse(cohort$Gender[alive_idx] == "Male",
-                                    cohort$YearlyRisk_Death_Male[alive_idx],
-                                    cohort$YearlyRisk_Death_Female[alive_idx])
+                                    YearlyRisk_Death_Male,
+                                    YearlyRisk_Death_Female)
     died <- die_by_age | die_by_sex
     status[alive_idx[died]] <- "Dead"
   }
