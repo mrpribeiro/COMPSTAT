@@ -238,7 +238,7 @@ cohort$Yearly_risk_disease <- r_baseline_disease * ifelse(cohort$SmokingStatus =
   ifelse(cohort$AgeGroup == ">=50", Relative_risk_Disease_Old, Relative_risk_Disease_Young)
 
 # Convert rates back to yearly probabilities
-cohort$Yearly_risk_disease <- 1 - exp(-cohort$Yearly_risk_death * 1)
+cohort$Yearly_risk_disease <- 1 - exp(-cohort$Yearly_risk_disease * 1)
 ```
 
 ## Dataframe with all the required columns
