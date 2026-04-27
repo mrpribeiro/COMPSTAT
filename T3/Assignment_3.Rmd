@@ -416,11 +416,4 @@ animate(animation, nframes = 100, fps = 10)
 
 # Conclusions
 
-
-```{r}
-# The discrepancy between the simulated results and the expected values based on cumulative probabilities can be attributed to several factors:
-# 1. Stochastic Variability: Monte Carlo simulations inherently involve randomness. Even with a large sample size of 100,000, there can be variability in the outcomes due to chance. Running multiple iterations of the simulation and averaging results can help mitigate this.
-# 2. Independence Assumption: The assumption that risk factors are independent may not hold true in real-world scenarios. If there are interactions between risk factors (e.g., smoking and age), the combined effect on disease and mortality risk may differ from the simple additive model used in the simulation.
-# 3. Transition Probability Estimation: The conversion of cumulative probabilities to annual rates and back to probabilities may introduce approximation errors, especially if the underlying risk does not follow a simple exponential distribution. The actual risk over time may be more complex than the model assumes. 
-
-```
+The discrepancy between the simulated results and the expected values based on cumulative probabilities is due to the randomness inherent to  Monte Carlo simulations. Even with a large sample size of 100,000, there can be variability in the outcomes due to chance. Running multiple iterations of the simulation and averaging results can help mitigate this.
