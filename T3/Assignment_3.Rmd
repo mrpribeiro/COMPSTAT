@@ -122,7 +122,7 @@ pop_smoke[idx_female] <- sample(
 )
 ```
 
-We consolidate the generated vectors into a single data frame, immediately converting them to factors. We also pre-allocate empty columns for the annual risks, which will be populated in Block 2.
+We consolidate the generated vectors into a single data frame, immediately converting them to factors.
 
 ```{r}
 # Building the data frame
@@ -197,7 +197,7 @@ YearlyRisk_Death_Female <- 1 - exp(-r_female_death * 1)
 
 ## Yearly risk of death and disease
 
-As the factors are independent, an individual’s risk is not simply the risk associated with their gender or their age alone, but rather the combination of both relative to the baseline risk. The classic way of calculating this in simple epidemiological simulations is using the Relative Risk (RR) relative to the baseline. To calculate the combined individual risk, the final risk for a specific individual is the baseline risk * RR for gender * RR for age.
+As the factors are independent, an individual’s risk is not simply the risk associated with their gender or their age alone, but rather the combination of both relative to the baseline risk. The classic way of calculating this in simple epidemiological simulations is using the Relative Risk (RR) relative to the baseline. To calculate the combined individual risk, the final risk for a specific individual is the baseline risk \* RR for gender \* RR for age.
 
 -   **5-year risk of disease:** 17.6%
 
@@ -248,7 +248,6 @@ cohort$Yearly_risk_disease <- 1 - exp(-cohort$Yearly_risk_death * 1)
 cohort
 ```
 
-
 ## Total Risk Calculation
 
 To check the answers obtained in the simulation we can calculate the total risk of disease in 10 years for the population and use it and the 10-year risk of any-cause mortality as a benchmark.
@@ -283,8 +282,8 @@ After 10 years the number of patients that died is `r num_death`.
 # Block 3: Markov Chain and Results Analysis
 
 # The Markov simulation is implemented as follows:
-the states shloud be "Healthy", after developing the disease the state should be "Ill" and after death the state should be "Dead". The transition from "Healthy" to "Ill" and from "Healthy" to "Dead" should be simulated in a way that if both events occur in the same year, death takes precedence over disease (competing risks).
-The risk most be compounded annually, meaning that the transition probabilities should be applied each year for 10 years, and the state of each subject should be updated accordingly. and from the risk of sex and smoker status (for disease) and from the risk of age and sex (for death) should be calculated the total risk for each subject and then applied in the simulation. No transition between "Ill" and "Dead" should be simulated, meaning that once a subject develops the disease, they remain in the "Ill" state until the end of the simulation or until they die (if they die, they transition to "Dead" state).
+
+the states shloud be "Healthy", after developing the disease the state should be "Ill" and after death the state should be "Dead". The transition from "Healthy" to "Ill" and from "Healthy" to "Dead" should be simulated in a way that if both events occur in the same year, death takes precedence over disease (competing risks). The risk most be compounded annually, meaning that the transition probabilities should be applied each year for 10 years, and the state of each subject should be updated accordingly. and from the risk of sex and smoker status (for disease) and from the risk of age and sex (for death) should be calculated the total risk for each subject and then applied in the simulation. No transition between "Ill" and "Dead" should be simulated, meaning that once a subject develops the disease, they remain in the "Ill" state until the end of the simulation or until they die (if they die, they transition to "Dead" state).
 
 ```{r}
 # Markov Simulation
@@ -413,7 +412,6 @@ animate(animation, nframes = 100, fps = 10)
 
 ```
 
-
 # Conclusions
 
-The discrepancy between the simulated results and the expected values based on cumulative probabilities is due to the randomness inherent to  Monte Carlo simulations. Even with a large sample size of 100,000, there can be variability in the outcomes due to chance. Running multiple iterations of the simulation and averaging results can help mitigate this.
+The discrepancy between the simulated results and the expected values based on cumulative probabilities is due to the randomness inherent to Monte Carlo simulations. Even with a large sample size of 100,000, there can be variability in the outcomes due to chance. Running multiple iterations of the simulation and averaging results can help mitigate this.
