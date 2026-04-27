@@ -288,6 +288,8 @@ The risk most be compounded annually, meaning that the transition probabilities 
 
 ```{r}
 # Markov Simulation
+# Reproducibility and sample size
+set.seed(9) 
 n_subjects <- nrow(cohort)
 status <- rep("Healthy", n_subjects)
  
@@ -341,6 +343,7 @@ Creation of a GIF to illustrate the Markov process:
 # Create the plot
 
 # Markov Simulation with state tracking
+set.seed(9)
 n_subjects <- nrow(cohort)
 status <- rep("Healthy", n_subjects)
 
@@ -407,7 +410,6 @@ p <- ggplot(animation_data_summary, aes(x = Year, y = Count, fill = Status)) +
 # Animate the plot
 animation <- p + transition_time(Year) + ease_aes('linear')
 animate(animation, nframes = 100, fps = 10)
-
 
 ```
 
