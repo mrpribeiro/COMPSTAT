@@ -337,6 +337,7 @@ Creation of a GIF to illustrate the Markov process:
 # Create the plot
 
 # Markov Simulation with state tracking
+set.seed(9)
 n_subjects <- nrow(cohort)
 status <- rep("Healthy", n_subjects)
 
