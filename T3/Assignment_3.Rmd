@@ -213,26 +213,32 @@ As the factors are independent, an individual’s risk is not simply the risk as
 
 ```{r}
 # Calculate the relative risk for age and gender
-Relative_risk_Death_Old <- 22.9 / 11.5
-Relative_risk_Death_Young <- 1/11.5
-Relative_risk_Death_Male <- 12.3/11.5
-Relative_risk_Death_Female <- 10.6/11.5
+Relative_risk_Death_Old <- prob_to_rate(0.229,1) / prob_to_rate(0.115,1)
+Relative_risk_Death_Young <- prob_to_rate(0.01,1)/prob_to_rate(0.115,1)
+Relative_risk_Death_Male <- prob_to_rate(0.123,1)/prob_to_rate(0.115,1)
+Relative_risk_Death_Female <- prob_to_rate(0.106,1)/prob_to_rate(0.115,1)
 
 # Calculate yearly risk of death for each patient (baseline risk * RR for gender * RR for age)
-cohort$Yearly_risk_death <- YearlyRisk_Death_Baseline * ifelse(cohort$AgeGroup == ">=50", Relative_risk_Death_Old, Relative_risk_Death_Young) *
+cohort$Yearly_risk_death <- r_baseline_death * ifelse(cohort$AgeGroup == ">=50", Relative_risk_Death_Old, Relative_risk_Death_Young) *
   ifelse(cohort$Gender == "Male", Relative_risk_Death_Male, Relative_risk_Death_Female)
+
+# Convert rates back to yearly probabilities
+cohort$Yearly_risk_death <- 1 - exp(-cohort$Yearly_risk_death * 1)
 ```
 
 ```{r}
 # Calculate the relative risk for age and smoking status for disease
-Relative_risk_Disease_Smoker <- 50.3 / 17.6
-Relative_risk_Disease_NonSmoker <- 5.4 / 17.6
-Relative_risk_Disease_Old <- 22.1 / 17.6
-Relative_risk_Disease_Young <- 13.2 / 17.6
+Relative_risk_Disease_Smoker <- prob_to_rate(0.503,1) / prob_to_rate(0.176,1)
+Relative_risk_Disease_NonSmoker <- prob_to_rate(0.054,1) / prob_to_rate(0.176,1)
+Relative_risk_Disease_Old <- prob_to_rate(0.221,1) / prob_to_rate(0.176,1)
+Relative_risk_Disease_Young <- prob_to_rate(0.132,1) / prob_to_rate(0.176,1)
 
 # Calculate yearly risk of disease for each patient (baseline risk * RR for smoking status * RR for age)
-cohort$Yearly_risk_disease <- YearlyRisk_Disease_Baseline * ifelse(cohort$SmokingStatus == "Smoker", Relative_risk_Disease_Smoker, Relative_risk_Disease_NonSmoker) *
+cohort$Yearly_risk_disease <- r_baseline_disease * ifelse(cohort$SmokingStatus == "Smoker", Relative_risk_Disease_Smoker, Relative_risk_Disease_NonSmoker) *
   ifelse(cohort$AgeGroup == ">=50", Relative_risk_Disease_Old, Relative_risk_Disease_Young)
+
+# Convert rates back to yearly probabilities
+cohort$Yearly_risk_disease <- 1 - exp(-cohort$Yearly_risk_death * 1)
 ```
 
 ## Dataframe with all the required columns
@@ -410,11 +416,4 @@ animate(animation, nframes = 100, fps = 10)
 
 # Conclusions
 
-
-```{r}
-# The discrepancy between the simulated results and the expected values based on cumulative probabilities can be attributed to several factors:
-# 1. Stochastic Variability: Monte Carlo simulations inherently involve randomness. Even with a large sample size of 100,000, there can be variability in the outcomes due to chance. Running multiple iterations of the simulation and averaging results can help mitigate this.
-# 2. Independence Assumption: The assumption that risk factors are independent may not hold true in real-world scenarios. If there are interactions between risk factors (e.g., smoking and age), the combined effect on disease and mortality risk may differ from the simple additive model used in the simulation.
-# 3. Transition Probability Estimation: The conversion of cumulative probabilities to annual rates and back to probabilities may introduce approximation errors, especially if the underlying risk does not follow a simple exponential distribution. The actual risk over time may be more complex than the model assumes. 
-
-```
+The discrepancy between the simulated results and the expected values based on cumulative probabilities is due to the randomness inherent to  Monte Carlo simulations. Even with a large sample size of 100,000, there can be variability in the outcomes due to chance. Running multiple iterations of the simulation and averaging results can help mitigate this.
